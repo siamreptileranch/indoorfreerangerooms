@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache">
+<title>SRR — Indoor Breeding Rooms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Myanmar:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --blue:#1877f2;--blue-dk:#166fe5;--blue-lt:#e7f3ff;
+  --bg:#f0f2f5;--surface:#fff;--border:#dde1e7;--text:#050505;--muted:#65676b;--hover:#f2f3f5;
+  --green:#42b72a;--green-dk:#1a5c0c;--green-lt:#e6f4ea;
+  --red:#fa3e3e;--red-dk:#9b1c1c;--red-lt:#fdeaea;
+  --amber:#f7b928;--amber-dk:#856404;--amber-lt:#fff3cd;
+  --purple:#7c3aed;--purple-lt:#f3e8ff;
+  --font:'Inter','Noto Sans Myanmar',sans-serif;--r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;min-height:100vh;padding-bottom:70px}
+.my{font-family:'Noto Sans Myanmar',var(--font);font-weight:400;color:var(--muted);font-size:.85em}
+button{font-family:var(--font)}
+
+/* NAV + TABS */
+.nav{background:var(--blue);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:300;box-shadow:0 2px 8px rgba(24,119,242,.3);gap:10px}
+.nav-logo{display:flex;align-items:center;gap:10px;color:#fff;min-width:0}
+.nav-ico{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.nav-name{font-size:15px;font-weight:700;line-height:1.2;white-space:nowrap}
+.nav-sub{font-size:10.5px;color:rgba(255,255,255,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.35);cursor:pointer;white-space:nowrap}
+.pill.ok{background:#e6f4ea;color:var(--green-dk);border-color:var(--green)}
+.pill.warn{background:var(--amber-lt);color:var(--amber-dk);border-color:var(--amber)}
+.pill.err{background:var(--red-lt);color:var(--red-dk);border-color:var(--red)}
+.clock{font-size:11px;color:rgba(255,255,255,.85);white-space:nowrap}
+.tabs{background:var(--surface);border-bottom:1px solid var(--border);display:flex;padding:0 12px;overflow-x:auto;position:sticky;top:56px;z-index:250}
+.tab{padding:10px 14px;border:none;background:transparent;font-size:13px;font-weight:700;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap;line-height:1.25;text-align:center}
+.tab .my{display:block;font-size:10px}
+.tab.on{color:var(--blue);border-bottom-color:var(--blue)}
+.tab:hover{background:var(--hover)}
+.main{max-width:1100px;margin:0 auto;padding:14px 12px}
+
+/* CARDS / FIELDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 1px 2px rgba(0,0,0,.06);margin-bottom:12px;overflow:hidden}
+.card-h{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#fafbfc}
+.card-t{font-size:14px;font-weight:800}
+.card-b{padding:12px 14px}
+.lbl{font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.03em;text-transform:uppercase;margin-bottom:3px;display:block}
+.lbl .my{text-transform:none;letter-spacing:0;font-size:10.5px}
+.in{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:14px;font-family:var(--font);color:var(--text);background:var(--bg);outline:none}
+.in:focus{border-color:var(--blue);background:#fff}
+textarea.in{resize:vertical;min-height:60px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.fld{margin-bottom:10px}
+.btn{padding:9px 16px;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-size:13px;font-weight:700;cursor:pointer;color:var(--text);line-height:1.2}
+.btn:hover{background:var(--hover)}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.pri:hover{background:var(--blue-dk)}
+.btn.grn{background:var(--green);border-color:var(--green);color:#fff}
+.btn.sm{padding:5px 10px;font-size:12px}
+.btn .my{color:inherit;opacity:.85}
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg button{flex:1;min-width:58px;padding:7px 6px;border-radius:7px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted);line-height:1.15}
+.seg button .my{display:block;font-size:9.5px;color:inherit}
+.seg button.on.ok,.seg button.on.on_{background:var(--green-lt);border-color:var(--green);color:var(--green-dk)}
+.seg button.on.off{background:#eceef1;border-color:#8a8d91;color:#333}
+.seg button.on.bad{background:var(--red-lt);border-color:var(--red);color:var(--red-dk)}
+.seg button.on.mid{background:var(--amber-lt);border-color:var(--amber);color:var(--amber-dk)}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;background:var(--hover);color:var(--muted);border:1px solid var(--border);white-space:nowrap}
+.chip.b{background:var(--blue-lt);color:var(--blue);border-color:#9cc4f7}
+.chip.g{background:var(--green-lt);color:var(--green-dk);border-color:#9fd89a}
+.chip.r{background:var(--red-lt);color:var(--red-dk);border-color:#f3a5a5}
+.chip.a{background:var(--amber-lt);color:var(--amber-dk);border-color:#f2d27d}
+
+/* TOP BAR (employee / room / date) */
+.topbar{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.topbar .f-emp{flex:1;min-width:160px}
+.rooms{display:flex;gap:6px;flex-wrap:wrap}
+.room-btn{padding:7px 12px;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-weight:800;font-size:13px;cursor:pointer;line-height:1.15;text-align:center;min-width:76px}
+.room-btn small{display:block;font-size:10px;font-weight:600;color:var(--muted)}
+.room-btn.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.room-btn.on small{color:rgba(255,255,255,.85)}
+.datebox{display:flex;gap:4px;align-items:center}
+.datebox .in{width:150px}
+.datebox .btn{padding:8px 10px}
+
+/* CAGE GRID */
+.prog{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.bar{height:8px;background:#e4e6eb;border-radius:4px;overflow:hidden;width:160px}
+.bar > i{display:block;height:100%;background:var(--green)}
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px;margin-bottom:12px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center}
+.stat b{display:block;font-size:22px;font-weight:800;line-height:1.1}
+.stat span{font-size:10.5px;color:var(--muted);font-weight:600}
+.cage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.cage{position:relative;border:2px solid var(--border);border-radius:9px;background:#fff;padding:7px 6px;cursor:pointer;text-align:center;min-height:74px;transition:transform .08s}
+.cage:hover{transform:translateY(-1px);border-color:var(--blue)}
+.cage .no{font-size:17px;font-weight:800;line-height:1}
+.cage .sx{font-size:11px;font-weight:700;color:var(--muted);margin-top:3px}
+.cage .st{font-size:9.5px;font-weight:700;margin-top:3px;color:var(--muted)}
+.cage.today{border-color:var(--green);background:#f1fbef}
+.cage.today .st{color:var(--green-dk)}
+.cage.week{border-color:#a7dca0;background:#fbfffa}
+.cage.poor{box-shadow:inset 4px 0 0 var(--amber)}
+.cage .lb{position:absolute;top:-7px;left:-7px;background:#1a7f37;color:#fff;font-size:10.5px;font-weight:800;border-radius:10px;padding:1px 6px;border:2px solid #fff}
+.lrow{display:grid;grid-template-columns:44px 130px 1fr 34px;gap:6px;align-items:center;margin-bottom:6px}
+.lrow .tag{font-size:16px;text-align:center;background:var(--green-lt);border-radius:6px;padding:4px 0}
+.laybtn{padding:7px 10px;border-radius:8px;border:1.5px solid #1a7f37;color:#1a7f37;background:#fff;font-weight:800;font-size:12px;cursor:pointer;line-height:1.15;text-align:center}
+.laybtn small{display:block;font-weight:500;font-size:9.5px}
+table.gt td.g{font-weight:800;text-align:left}
+table.gt tr.tot td{background:#f5f6f8;font-weight:800;border-top:2px solid var(--border)}
+table.gt td.lay{background:#f1fbef;color:var(--green-dk);font-weight:800}
+.gdash-top{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:12px}
+.gbig{border-radius:14px;padding:16px;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.gbig b{display:block;font-size:40px;font-weight:800;line-height:1.05}
+.gbig span{font-size:12px;font-weight:700;opacity:.95}
+.gcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-bottom:12px}
+.gcard{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.gcard-h{padding:12px 16px;color:#fff;display:flex;align-items:center;gap:10px}
+.gcard-h .gn{font-size:30px;font-weight:800;line-height:1}
+.gcard-h .gs{font-size:12px;font-weight:600;opacity:.95;line-height:1.35}
+.gnums{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border)}
+.gnum{padding:12px 14px;text-align:center}
+.gnum + .gnum{border-left:1px solid var(--border)}
+.gnum b{display:block;font-size:44px;font-weight:800;line-height:1}
+.gnum span{font-size:11.5px;font-weight:700;color:var(--muted)}
+.gmini{display:grid;grid-template-columns:repeat(4,1fr);text-align:center;padding:8px 6px;gap:4px;border-bottom:1px solid var(--border)}
+.gmini b{display:block;font-size:17px;font-weight:800}
+.gmini span{font-size:10px;color:var(--muted);font-weight:700;line-height:1.2}
+.glay{padding:10px 14px;border-bottom:1px solid var(--border)}
+.glay .bar2{display:flex;height:12px;border-radius:6px;overflow:hidden;background:#e4e6eb;margin:6px 0 4px}
+.glay .bar2 i{display:block;height:100%}
+.grooms{padding:8px 14px 12px}
+.grooms table{width:100%;border-collapse:collapse;font-size:12.5px}
+.grooms td,.grooms th{padding:4px 4px;text-align:center;border-bottom:1px solid #f0f1f3}
+.grooms th{font-size:10px;color:var(--muted);font-weight:800}
+.grooms td:first-child,.grooms th:first-child{text-align:left;font-weight:800}
+.gcard.empty{opacity:.55}
+.cage .fb{position:absolute;top:-7px;right:-7px;background:var(--red);color:#fff;font-size:10.5px;font-weight:800;border-radius:10px;padding:1px 6px;border:2px solid #fff}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;border:2px solid var(--border);vertical-align:-2px;margin-right:4px}
+
+/* SHEET (cage editor) */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:flex-start;justify-content:center;padding:14px 8px;overflow-y:auto}
+.ov.open{display:flex}
+.sheet{background:#fff;border-radius:12px;width:100%;max-width:760px;box-shadow:0 10px 40px rgba(0,0,0,.3);display:flex;flex-direction:column;max-height:calc(100vh - 28px)}
+.sheet-h{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border)}
+.sheet-t{font-size:16px;font-weight:800;flex:1;line-height:1.2}
+.sheet-b{padding:12px 14px;overflow-y:auto}
+.sheet-f{display:flex;gap:8px;justify-content:flex-end;padding:10px 14px;border-top:1px solid var(--border);flex-wrap:wrap}
+.x{width:34px;height:34px;border-radius:50%;border:none;background:#f0f2f5;font-size:15px;cursor:pointer;flex-shrink:0}
+.sec{font-size:11px;font-weight:800;color:var(--blue);letter-spacing:.04em;text-transform:uppercase;margin:14px 0 8px;padding-top:10px;border-top:1px solid var(--border)}
+.sec:first-child{margin-top:0;border-top:none;padding-top:0}
+.sec .my{text-transform:none;letter-spacing:0;color:var(--muted)}
+.timebox{display:flex;gap:6px;align-items:center}
+.timebox .in{flex:1;min-width:0}
+.tbx{display:flex;align-items:center;gap:5px;flex:1;min-width:0}
+.tbx .tin{width:86px;flex:0 0 86px;text-align:center;font-weight:800;letter-spacing:.5px;padding:7px 6px}
+.tbx .tin.bad{border-color:var(--red);background:var(--red-lt)}
+.t12{font-size:10.5px;color:var(--muted);font-weight:700;white-space:nowrap}
+.per{display:flex;gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
+.per .dash{font-weight:800;color:var(--muted)}
+.per .tbx{flex:0 0 auto}
+.per .t12{min-width:58px}
+.per .pn{font-size:10.5px;font-weight:800;color:var(--blue);background:var(--blue-lt);border-radius:10px;padding:2px 7px}
+.mh.none{background:#f5f6f7;color:var(--muted)}
+.timebox .btn{flex-shrink:0;padding:5px 8px}
+.prefill{background:var(--amber-lt);border:1px solid #f2d27d;color:var(--amber-dk);border-radius:8px;padding:7px 10px;font-size:12px;font-weight:600;margin-bottom:10px}
+.ftypes{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.ftype{padding:7px 10px;border-radius:8px;border:1.5px solid;background:#fff;font-weight:800;font-size:12px;cursor:pointer;line-height:1.15;text-align:center}
+.ftype small{display:block;font-weight:500;font-size:9.5px}
+.frow{display:grid;grid-template-columns:76px 110px 90px 1fr 34px;gap:6px;align-items:center;margin-bottom:6px}
+.frow .tag{font-size:11px;font-weight:800;padding:6px 4px;border-radius:6px;text-align:center;color:#fff}
+.frow .seg button{min-width:0;padding:6px 2px}
+.gp-display{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:7px;padding:8px 10px;font-size:13px;font-weight:600;cursor:pointer;min-height:38px;line-height:1.3}
+.gp-display.empty{color:var(--muted);font-weight:500}
+.stepper{display:flex;gap:4px}
+.stepper .in{text-align:center;font-weight:800}
+.stepper .btn{padding:6px 12px;font-size:16px}
+
+/* GENE PICKER */
+#gp-modal{z-index:700}
+.gp-group{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin:12px 0 6px}
+.gp-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px}
+.gp-item{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;padding:4px 0;cursor:pointer}
+
+/* ROOM CHECK */
+.banner{border-radius:var(--r);padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-weight:700;border:2px solid var(--border);background:var(--surface)}
+.banner.now{border-color:var(--blue);background:var(--blue-lt);color:var(--blue)}
+.banner.soon{border-color:var(--amber);background:var(--amber-lt);color:var(--amber-dk)}
+.banner.done{border-color:var(--green);background:var(--green-lt);color:var(--green-dk)}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:8px}
+.slot{border:2px solid var(--border);border-radius:9px;padding:8px;background:#fff}
+.slot .tm{font-weight:800;font-size:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.slot .in{padding:6px 8px;font-size:14px;font-weight:700;text-align:center;margin-bottom:5px}
+.slot.saved{border-color:var(--green);background:#f6fff4}
+.slot.missed{border-color:var(--red);background:#fff7f7}
+.slot.now{border-color:var(--blue);box-shadow:0 0 0 3px rgba(24,119,242,.18)}
+.slot .u{font-size:10px;color:var(--muted);font-weight:600}
+.unit{border:1.5px solid var(--border);border-radius:9px;padding:10px;background:#fcfcfd}
+.unit-h{font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.units{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px}
+.timer-tbl{width:100%;border-collapse:collapse}
+.timer-tbl th{font-size:10.5px;color:var(--muted);text-align:left;padding:4px;font-weight:700}
+.timer-tbl td{padding:6px 4px;vertical-align:top;border-bottom:1px solid #eef0f3}
+.timer-tbl td:first-child{font-weight:800;font-size:13px;white-space:nowrap}
+.bulbs{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
+.bulb{border:1.5px solid var(--green);background:var(--green-lt);color:var(--green-dk);border-radius:6px;font-size:11px;font-weight:800;padding:6px 0;text-align:center;cursor:pointer;user-select:none}
+.bulb.bad{border-color:var(--red);background:var(--red);color:#fff}
+.mh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:6px}
+.mh{display:flex;align-items:center;gap:4px;border:1px solid var(--border);border-radius:7px;padding:4px 6px;font-size:12px;background:#fff}
+.mh b{width:30px;flex-shrink:0}
+.mh select{flex:1;min-width:0;padding:4px;border:1px solid var(--border);border-radius:5px;font-size:12px;font-family:var(--font);background:var(--bg)}
+.mh.bad{border-color:var(--red);background:#fff5f5}
+.savebar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--border);padding:10px 14px;display:flex;gap:10px;justify-content:center;align-items:center;z-index:260;box-shadow:0 -2px 10px rgba(0,0,0,.06);flex-wrap:wrap}
+.savebar .note{font-size:12px;color:var(--muted);font-weight:600}
+.changes{font-size:12px;line-height:1.6}
+.changes div{border-bottom:1px dashed var(--border);padding:3px 0}
+
+/* STATS / HISTORY */
+.tbl-wrap{overflow-x:auto}
+table.t{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff}
+table.t th{background:#f5f6f8;font-size:10.5px;font-weight:800;color:var(--muted);padding:7px 9px;text-align:center;border-bottom:2px solid var(--border);white-space:nowrap}
+table.t th:first-child,table.t td:first-child{text-align:left}
+table.t td{padding:6px 9px;border-bottom:1px solid #eef0f3;text-align:center;white-space:nowrap}
+table.t tr.grp td{background:#f0f6ff;font-weight:800;color:var(--blue);font-size:11px;text-transform:uppercase;letter-spacing:.03em}
+table.t td.hi{background:var(--red-lt);color:var(--red-dk);font-weight:800}
+table.t td.best{background:var(--green-lt);color:var(--green-dk);font-weight:800}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
+.chart-box{position:relative;height:250px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+.empty{color:var(--muted);text-align:center;padding:24px;font-size:13px}
+
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(10px);padding:10px 18px;border-radius:9px;font-size:13px;font-weight:600;opacity:0;transition:all .25s;z-index:900;pointer-events:none;background:#050505;color:#fff;max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:var(--green)}.toast.err{background:var(--red)}
+
+@media(max-width:640px){
+  .units{grid-template-columns:1fr}
+  .timer-tbl,.timer-tbl tbody,.timer-tbl tr,.timer-tbl td{display:block;width:100%}
+  .timer-tbl tr:first-child{display:none}
+  .timer-tbl td{border-bottom:none;padding:4px 0}
+  .timer-tbl tr{border-bottom:1px solid #eef0f3;padding:6px 0;position:relative}
+  .timer-tbl td:last-child{position:absolute;top:8px;right:0;width:auto}
+  .per{flex-wrap:nowrap}
+  .per .t12{display:none}
+  .mh-grid{grid-template-columns:1fr 1fr}
+  .mh{flex-wrap:wrap}
+  .mh b{width:100%}
+  .g3,.g4{grid-template-columns:1fr 1fr}
+  .nav-name{font-size:13.5px}
+  .clock{display:none}
+  .frow{grid-template-columns:64px 1fr 74px 34px}
+  .frow .gp-display{grid-column:1 / -1;order:5}
+  .bulbs{grid-template-columns:repeat(8,1fr)}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="nav-ico">🏠</div>
+    <div style="min-width:0">
+      <div class="nav-name">Indoor Breeding Rooms · INFR#1–4</div>
+      <div class="nav-sub">အိမ်တွင်း မွေးမြူရေးအခန်းများ — SRR</div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <span class="pill" id="pill" onclick="syncNow()">⬤ …</span>
+    <span class="clock" id="clock"></span>
+  </div>
+</nav>
+
+<div class="tabs">
+  <button class="tab on" id="tab-groups" onclick="showTab('groups')">🏆 Breeding Groups G1–G6<span class="my">မွေးမြူရေးအုပ်စု ၁–၆</span></button>
+  <button class="tab" id="tab-cages" onclick="showTab('cages')">🦎 Cage Checks<span class="my">လှောင်အိမ် စစ်ဆေးမှု</span></button>
+  <button class="tab" id="tab-room" onclick="showTab('room')">🌡️ Room Check · Appliances<span class="my">အခန်းစစ်ဆေးခြင်း · စက်ပစ္စည်းများ</span></button>
+  <button class="tab" id="tab-stats" onclick="showTab('stats')">📊 Summary &amp; Stats<span class="my">အနှစ်ချုပ်နှင့် စာရင်းအင်း</span></button>
+  <button class="tab" id="tab-history" onclick="showTab('history')">🕐 History<span class="my">မှတ်တမ်း</span></button>
+</div>
+
+<div class="main">
+
+  <div id="setup-warn" class="prefill" style="display:none"></div>
+
+  <!-- EMPLOYEE / ROOM / DATE (shared by Breeding Groups + Room Check) -->
+  <div class="card" id="topbar-card">
+    <div class="card-b topbar">
+      <div class="f-emp">
+        <span class="lbl">Checked by · <span class="my">စစ်ဆေးသူ</span></span>
+        <input class="in" id="emp" placeholder="Your name · နာမည်" oninput="saveEmp(this.value)">
+      </div>
+      <div>
+        <span class="lbl">Room · <span class="my">အခန်း</span></span>
+        <div class="rooms" id="rooms"></div>
+      </div>
+      <div>
+        <span class="lbl">Date · <span class="my">ရက်စွဲ</span></span>
+        <div class="datebox">
+          <button class="btn" onclick="shiftDate(-1)">‹</button>
+          <input class="in" type="date" id="date" onchange="setDate(this.value)">
+          <button class="btn" onclick="shiftDate(1)">›</button>
+          <button class="btn sm" onclick="setDate(todayStr())">Today<br><span class="my">ယနေ့</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ BREEDING GROUPS ═══ -->
+  <div id="page-groups"></div>
+  <div id="page-cages" style="display:none"></div>
+
+  <!-- ═══ ROOM CHECK ═══ -->
+  <div id="page-room" style="display:none"></div>
+
+  <!-- ═══ SUMMARY & STATS ═══ -->
+  <div id="page-stats" style="display:none">
+    <div class="filters">
+      <div class="seg" id="stats-range" style="min-width:300px"></div>
+      <div><span class="lbl">From · <span class="my">မှ</span></span><input class="in" type="date" id="st-from"></div>
+      <div><span class="lbl">To · <span class="my">အထိ</span></span><input class="in" type="date" id="st-to"></div>
+      <button class="btn pri" onclick="loadStats(true)">Show · <span class="my">ပြရန်</span></button>
+      <span id="stats-note" class="chip"></span>
+    </div>
+    <div id="stats-body"></div>
+  </div>
+
+  <!-- ═══ HISTORY ═══ -->
+  <div id="page-history" style="display:none">
+    <div class="filters">
+      <div>
+        <span class="lbl">Show · <span class="my">ပြရန်</span></span>
+        <select class="in" id="h-type" onchange="renderHistory()">
+          <option value="cage">🦎 Cage checks · လှောင်အိမ်စစ်ဆေးမှု</option>
+          <option value="reading">🌡️ Hourly temp &amp; humidity · အပူချိန်/စိုထိုင်းဆ</option>
+          <option value="roomday">⚙️ Appliances · စက်ပစ္စည်းများ</option>
+          <option value="changes">⏱️ Timer &amp; setting changes · အချိန်ကိုက် ပြောင်းလဲမှု</option>
+        </select>
+      </div>
+      <div>
+        <span class="lbl">Room · <span class="my">အခန်း</span></span>
+        <select class="in" id="h-room" onchange="renderHistory()">
+          <option value="all">All rooms · အားလုံး</option>
+          <option value="1">INFR#1</option><option value="2">INFR#2</option><option value="3">INFR#3</option><option value="4">INFR#4</option>
+        </select>
+      </div>
+      <div><span class="lbl">From · <span class="my">မှ</span></span><input class="in" type="date" id="h-from" onchange="renderHistory()"></div>
+      <div><span class="lbl">To · <span class="my">အထိ</span></span><input class="in" type="date" id="h-to" onchange="renderHistory()"></div>
+      <button class="btn" onclick="loadHistoryRange()">☁️ Load from Sheet · <span class="my">ဆွဲယူရန်</span></button>
+      <button class="btn grn" onclick="exportCSV()">⬇ CSV</button>
+    </div>
+    <div class="card"><div class="tbl-wrap" id="history-body"></div></div>
+  </div>
+
+</div>
+
+<!-- SAVE BAR (Room Check) -->
+<div class="savebar" id="room-savebar" style="display:none">
+  <span class="note" id="room-save-note"></span>
+  <button class="btn grn" onclick="saveRoomDay()">💾 Save room check · <span class="my">အခန်းစစ်ဆေးမှု သိမ်းရန်</span></button>
+</div>
+
+<!-- CAGE EDITOR -->
+<div class="ov" id="cage-ov" onclick="if(event.target===this) closeCage()">
+  <div class="sheet">
+    <div class="sheet-h">
+      <button class="x" onclick="moveCage(-1)" title="Previous cage">‹</button>
+      <div class="sheet-t" id="cage-title"></div>
+      <button class="x" onclick="moveCage(1)" title="Next cage">›</button>
+      <button class="x" onclick="closeCage()">✕</button>
+    </div>
+    <div class="sheet-b" id="cage-body"></div>
+    <div class="sheet-f">
+      <button class="btn" onclick="closeCage()">Cancel · <span class="my">မလုပ်တော့</span></button>
+      <button class="btn pri" onclick="saveCage(false)">💾 Save · <span class="my">သိမ်းရန်</span></button>
+      <button class="btn grn" onclick="saveCage(true)">💾 Save &amp; next cage ›<br><span class="my">သိမ်းပြီး နောက်တစ်ခု</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- GENE / MORPH PICKER (same list as the Animal ID app) -->
+<div class="ov" id="gp-modal" onclick="if(event.target===this) closeGenePicker()">
+  <div class="sheet" style="max-width:480px">
+    <div class="sheet-h">
+      <div class="sheet-t">🧬 Select Genes<div class="my" style="font-size:12px">မျိုးရိုးလက္ခဏာများ ရွေးပါ</div></div>
+      <button class="x" onclick="closeGenePicker()">✕</button>
+    </div>
+    <div class="sheet-b" id="gp-body"></div>
+    <div class="sheet-f">
+      <button class="btn" onclick="clearGenePicker()">Clear · <span class="my">ဖျက်ရန်</span></button>
+      <button class="btn" onclick="closeGenePicker()">Cancel · <span class="my">မလုပ်တော့</span></button>
+      <button class="btn pri" onclick="confirmGenePicker()">✔ Apply · <span class="my">အတည်ပြု</span></button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CONFIG + GLOBAL STATE — every global lives up here (declared before init)
+// ══════════════════════════════════════════════════════════════════
+// Paste the Apps Script /exec URL here (see Code.gs → SETUP):
+var SHEET_URL = 'https://script.google.com/macros/s/AKfycbw4kF4nxN5StbdeAPvRXDp-E5p7hc2zek2rqo8eFdoDz08eBWHaOB8beAJElXjdR_bA/exec';
+var NEED_SCRIPT_VERSION = '2026-10-28d';
+var APP_VERSION = '2026-10-28d';
+
+var ROOMS = [ {n:1, cages:28}, {n:2, cages:20}, {n:3, cages:31}, {n:4, cages:46} ];
+var SLOTS = [
+  {t:'06:00', l:'6:00 AM',  my:'မနက် ၆ နာရီ'},
+  {t:'08:00', l:'8:00 AM',  my:'မနက် ၈ နာရီ'},
+  {t:'10:00', l:'10:00 AM', my:'မနက် ၁၀ နာရီ'},
+  {t:'12:00', l:'12:00 PM', my:'မွန်းတည့် ၁၂ နာရီ'},
+  {t:'13:00', l:'1:00 PM',  my:'နေ့လယ် ၁ နာရီ'},
+  {t:'14:00', l:'2:00 PM',  my:'နေ့လယ် ၂ နာရီ'},
+  {t:'15:00', l:'3:00 PM',  my:'နေ့လယ် ၃ နာရီ'},
+  {t:'16:00', l:'4:00 PM',  my:'ညနေ ၄ နာရီ'}
+];
+var FIND = [
+  {k:'SICK', en:'Sick',           my:'နေမကောင်း',     c:'#e02424'},
+  {k:'FF',   en:'Fungus',         my:'မှို',           c:'#0e9f6e'},
+  {k:'HC',   en:'Handicap',       my:'မသန်စွမ်း',      c:'#7c3aed'},
+  {k:'SW',   en:'Swollen joints', my:'အဆစ်ရောင်',      c:'#d97706'},
+  {k:'SKY',  en:'Skinny',         my:'ပိန်',            c:'#0891b2'},
+  {k:'MR',   en:'Mouth rot',      my:'ပါးစပ်ပုပ်',      c:'#be185d'},
+  {k:'BF',   en:'Butt fungus',    my:'နောက်ပိုင်းမှို',  c:'#4b5563'}
+];
+var GROUPS = ['G1','G2','G3','G4','G5','G6','Unknown'];
+var CONDS = [
+  {k:'Good', my:'ကောင်း',   cls:'ok'},
+  {k:'Fair', my:'သင့်တင့်', cls:'mid'},
+  {k:'Poor', my:'ညံ့',      cls:'bad'}
+];
+var PAIR_FIELDS = ['females','males','fMorph','mMorph','fGroup','mGroup','paired','apart','clutches','cond'];
+
+var LS_KEY = 'srr_infr_v1';
+var DB = { cage:{}, reading:{}, roomday:{} };
+var LATEST = {};        // room|cage → newest cage record from the Sheet (any age)
+var PENDING = {};       // 'kind|key' → true until the Sheet confirms
+var SERVER_TS = 0;      // server time of the last list (for "since" pulls)
+var LAST_MOD = '';
+var scriptOutdated = false;
+var pushing = false;
+var curTab = 'groups', curRoom = 1, curDate = '';
+var editing = null, editingDirty = false;
+var RD = null, rdDirty = false;       // room-day (appliances) being edited
+var readingDraft = {};                // slot → {temp,hum} being typed
+var STATS_CACHE = null, statsRange = '7', charts = {};
+var HIST_EXTRA = null;                // records loaded for an older History range
+var _gpOnConfirm = null;
+
+// ══════════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════════
+function pad(n){ return String(n).padStart(2,'0'); }
+function ymd(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function todayStr(){ return ymd(new Date()); }
+function nowHM(){ var d=new Date(); return pad(d.getHours())+':'+pad(d.getMinutes()); }
+function parseYmd(s){ var p=String(s).split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
+function addDays(s, n){ var d=parseYmd(s); d.setDate(d.getDate()+n); return ymd(d); }
+function weekStart(s){ var d=parseYmd(s); var w=(d.getDay()+6)%7; d.setDate(d.getDate()-w); return ymd(d); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function num(v){ var n=parseFloat(v); return isNaN(n)?0:n; }
+function hrs(on, off){
+  if(!on||!off) return null;
+  var a=on.split(':'), b=off.split(':');
+  var d=(+b[0]*60+(+b[1]||0))-(+a[0]*60+(+a[1]||0)); if(d<0) d+=1440;
+  return Math.round(d/60*100)/100;
+}
+function mins(s,e){ var h=hrs(s,e); return h==null?null:Math.round(h*60); }
+// ── TYPED TIME (no clock dial) ──
+// Accepts 630, 0630, 6:30, 6.30, 1430, 14, 6, 2pm, 2:30 pm, 12am → "HH:MM" (24-hour)
+function normTime(raw){
+  var s=String(raw||'').trim().toLowerCase().replace(/\s+/g,'');
+  if(!s) return '';
+  var pm=/p/.test(s), am=/a/.test(s);
+  s=s.replace(/[apm]/g,'').replace(/[.:]+$/,'');
+  var h, m;
+  var parts=s.split(/[:.\-h]/).filter(String);
+  if(parts.length>=2){ h=+parts[0]; m=+parts[1]; }
+  else {
+    var d=parts[0]||''; if(!/^\d{1,4}$/.test(d)) return null;
+    if(d.length<=2){ h=+d; m=0; } else if(d.length===3){ h=+d[0]; m=+d.slice(1); } else { h=+d.slice(0,2); m=+d.slice(2); }
+  }
+  if(isNaN(h)||isNaN(m)) return null;
+  if(pm && h<12) h+=12; if(am && h===12) h=0;
+  if(m>59 || h>24 || (h===24 && m>0)) return null;
+  return pad(h)+':'+pad(m);
+}
+function to12(v){
+  if(!v||!/^\d\d:\d\d$/.test(v)) return '';
+  var h=+v.slice(0,2), m=v.slice(3); if(h===24) return 'midnight';
+  return (h%12||12)+':'+m+' '+(h<12?'AM':'PM');
+}
+// kind: 'rd' = room check field, 'e' = cage editor field, 'per' = lighting period (path light.i.on/off)
+function tbox(kind, path, val, id){
+  return '<span class="tbx"><input class="in tin" type="text" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="HH:MM"'+(id?' id="'+id+'"':'')+
+    ' data-k="'+kind+'" data-p="'+path+'" value="'+esc(val||'')+'" onchange="tChange(this)" onkeydown="if(event.key===\'Enter\')this.blur()">'+
+    '<span class="t12">'+to12(val)+'</span></span>';
+}
+function tChange(el){
+  var v=normTime(el.value);
+  if(v===null){ el.classList.add('bad'); showToast('Type a time like 6:30 or 1430 or 2pm · အချိန် ရိုက်ပါ','err'); return; }
+  el.classList.remove('bad'); el.value=v; el.nextElementSibling.textContent=to12(v);
+  var k=el.getAttribute('data-k'), p=el.getAttribute('data-p');
+  if(k==='rd') setRD(p,v);
+  else if(k==='e') setE(p,v);
+  else if(k==='per'){ var a=p.split('.'); RD[a[0]].periods[+a[1]][a[2]]=v; rdDirty=true; updRoomDerived(); }
+}
+// ── LIGHTING ON-PERIODS (e.g. 06:00–12:00 then 14:00–17:00) ──
+function periodsOf(x){
+  if(!x) return [];
+  if(Array.isArray(x.periods)) return x.periods;
+  if(x.on||x.off) return [{on:x.on||'', off:x.off||''}];
+  return [];
+}
+function schedHrs(x){
+  var t=null; periodsOf(x).forEach(function(p){ var h=hrs(p.on,p.off); if(h!=null) t=(t||0)+h; });
+  return t==null?null:Math.round(t*100)/100;
+}
+function schedStr(x){ return periodsOf(x).filter(function(p){ return p.on||p.off; }).map(function(p){ return (p.on||'?')+'–'+(p.off||'?'); }).join(', '); }
+function fmtH(h){ return h==null?'—':(Math.round(h*10)/10)+' h'; }
+function avg(a){ return a.length ? a.reduce(function(x,y){return x+y;},0)/a.length : null; }
+function r1(v){ return v==null?'—':Math.round(v*10)/10; }
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+function getPath(o,p){ return p.split('.').reduce(function(x,k){ return x==null?undefined:x[k]; }, o); }
+function setPath(o,p,v){ var ks=p.split('.'); var x=o; for(var i=0;i<ks.length-1;i++){ if(x[ks[i]]==null) x[ks[i]] = /^\d+$/.test(ks[i+1])?[]:{}; x=x[ks[i]]; } x[ks[ks.length-1]]=v; }
+function roomCages(n){ return ROOMS[n-1].cages; }
+function emp(){ return (document.getElementById('emp').value||'').trim(); }
+function saveEmp(v){ try{ localStorage.setItem('srr_infr_emp', v); }catch(e){} }
+function showToast(m, cls){ var t=document.getElementById('toast'); t.textContent=m; t.className='toast show '+(cls||''); clearTimeout(t._h); t._h=setTimeout(function(){ t.className='toast'; }, 2800); }
+function findDef(k){ for(var i=0;i<FIND.length;i++) if(FIND[i].k===k) return FIND[i]; return {k:k,en:k,my:'',c:'#666'}; }
+
+// ══════════════════════════════════════════════════════════════════
+// LOCAL STORAGE — memory first; the Sheet is the master copy. This
+// device keeps the last 21 days + anything not sent yet. Storage shared
+// with the other SRR apps can fill up, so a failed write never blocks a save.
+// ══════════════════════════════════════════════════════════════════
+function loadLocal(){
+  try{
+    var d = JSON.parse(localStorage.getItem(LS_KEY)||'null');
+    if(d && d.DB){ DB=d.DB; LATEST=d.LATEST||{}; PENDING=d.PENDING||{}; SERVER_TS=d.SERVER_TS||0; }
+    ['cage','reading','roomday'].forEach(function(k){ if(!DB[k]) DB[k]={}; });
+  }catch(e){}
+}
+function persist(){
+  var cut = addDays(todayStr(), -21);
+  ['cage','reading','roomday'].forEach(function(k){
+    Object.keys(DB[k]).forEach(function(key){ if(DB[k][key].date < cut && !PENDING[k+'|'+key]) delete DB[k][key]; });
+  });
+  try{ localStorage.setItem(LS_KEY, JSON.stringify({DB:DB, LATEST:LATEST, PENDING:PENDING, SERVER_TS:SERVER_TS})); }
+  catch(e){
+    try{ localStorage.setItem(LS_KEY, JSON.stringify({DB:pendingOnly(), LATEST:{}, PENDING:PENDING, SERVER_TS:0})); }catch(e2){}
+  }
+}
+function pendingOnly(){
+  var o={cage:{},reading:{},roomday:{}};
+  Object.keys(PENDING).forEach(function(pk){ var i=pk.indexOf('|'); var k=pk.slice(0,i), key=pk.slice(i+1); if(DB[k][key]) o[k][key]=DB[k][key]; });
+  return o;
+}
+function keyOf(kind, o){
+  if(kind==='cage') return o.room+'|'+o.cage+'|'+o.date;
+  if(kind==='reading') return o.room+'|'+o.date+'|'+o.slot;
+  return o.room+'|'+o.date;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GENE / MORPH PICKER — same list as the Animal ID app
+// ══════════════════════════════════════════════════════════════════
+var COLOR_GROUPS = [
+  { id:'base',    label:'Base Morphs', colors:['FANCY (F)','RED (R)','BLUE BAR (BB)','LEATHERBACK (LB)','DUNNER (D)','GENETIC STRIPE (GS)','COLOR STRIPE (CS)','TRANS (T)','YELLOW (Y)','SNOW (SN)','PASTEL (P)','UC'] },
+  { id:'het',     label:'HET', colors:['HET ALBINO (HA)','HET DARK RED (HDR)','HET ZERO (HZ)','HET TRANS (HT)','HET WITBLIT (HW)','HET THUNDERBOLT (HTB)','HET PARADOX (HP)'] },
+  { id:'poss',    label:'POSS HET', colors:['POSS HET ZERO ALBINO (PHZA)','POSS HET WITBLIT ALBINO (PHWA)','POSS HET ALBINO (PHA)'] },
+  { id:'pure',    label:'Premium Morphs', colors:['ALBINO (A)','DARK RED (DR)','ZERO (Z)','WITBLIT (W)','THUNDERBOLT (TB)','MARBLE (MB)','AXANTHIC (AX)','ZERO TRANS (ZT)'] },
+  { id:'special', label:'Special', colors:['GHOST YELLOW (G/Y)','GHOST ORANGE (G/O)','SUPER BLUE (SB)','PHANTOM RED (PR)','CLOWN (CL)','FLAME (FL)','MAGMA (M)','CORAL (C)','PARADOX (PARA)','DOTS (DOTS)'] }
+];
+var ALL_COLORS = [];
+COLOR_GROUPS.forEach(function(g){ ALL_COLORS = ALL_COLORS.concat(g.colors); });
+function canonGene(s){ var k=String(s||'').trim().toUpperCase(); for(var i=0;i<ALL_COLORS.length;i++) if(ALL_COLORS[i].toUpperCase()===k) return ALL_COLORS[i]; return String(s||'').trim(); }
+function openGenePicker(cur, cb){
+  _gpOnConfirm = cb;
+  var sel = String(cur||'').split('/').map(canonGene).filter(Boolean);
+  var known = {}; ALL_COLORS.forEach(function(c){ known[c]=1; });
+  var extra = sel.filter(function(s){ return !known[s]; });
+  var h='';
+  COLOR_GROUPS.forEach(function(g){
+    h+='<div class="gp-group">'+esc(g.label)+'</div><div class="gp-grid">';
+    g.colors.forEach(function(c){ h+='<label class="gp-item"><input type="checkbox" class="gp-cb" value="'+esc(c)+'"'+(sel.indexOf(c)>=0?' checked':'')+'> '+esc(c)+'</label>'; });
+    h+='</div>';
+  });
+  h+='<div class="gp-group">Other (type, comma-separated) · အခြား</div><input class="in" id="gp-custom" value="'+esc(extra.join(', '))+'" placeholder="e.g. a morph not on this list">';
+  document.getElementById('gp-body').innerHTML=h;
+  document.getElementById('gp-modal').classList.add('open');
+}
+function closeGenePicker(){ document.getElementById('gp-modal').classList.remove('open'); _gpOnConfirm=null; }
+function clearGenePicker(){ Array.prototype.forEach.call(document.querySelectorAll('.gp-cb'),function(e){ e.checked=false; }); document.getElementById('gp-custom').value=''; }
+function confirmGenePicker(){
+  var p = Array.prototype.map.call(document.querySelectorAll('.gp-cb:checked'), function(e){ return e.value; });
+  String(document.getElementById('gp-custom').value||'').split(',').map(function(s){return s.trim();}).filter(Boolean).forEach(function(s){ if(p.indexOf(s)<0) p.push(s); });
+  var cb=_gpOnConfirm; closeGenePicker(); if(cb) cb(p.join(' / '));
+}
+function morphBox(val, onclick){
+  return '<div class="gp-display'+(val?'':' empty')+'" onclick="'+onclick+'">'+(val?esc(val):'— tap to select · ရွေးပါ —')+'</div>';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// NAV: tabs / room / date
+// ══════════════════════════════════════════════════════════════════
+function showTab(t){
+  if(curTab==='room' && t!=='room' && rdDirty && !confirm('Room check not saved. Leave anyway? · မသိမ်းရသေးပါ။ ထွက်မလား?')) return;
+  curTab=t;
+  ['groups','cages','room','stats','history'].forEach(function(p){
+    document.getElementById('page-'+p).style.display = p===t?'block':'none';
+    document.getElementById('tab-'+p).classList.toggle('on', p===t);
+  });
+  document.getElementById('topbar-card').style.display = (t==='cages'||t==='room')?'block':'none';
+  document.getElementById('room-savebar').style.display = t==='room'?'flex':'none';
+  if(t==='room') loadRoomDay();
+  render();
+}
+function renderRooms(){
+  document.getElementById('rooms').innerHTML = ROOMS.map(function(r){
+    return '<button class="room-btn'+(r.n===curRoom?' on':'')+'" onclick="setRoom('+r.n+')">INFR#'+r.n+'<small>'+r.cages+' cages · လှောင်အိမ်</small></button>';
+  }).join('');
+}
+function setRoom(n){
+  if(curTab==='room' && rdDirty && !confirm('Room check not saved. Switch room anyway? · မသိမ်းရသေးပါ။')) return;
+  curRoom=n; try{ localStorage.setItem('srr_infr_room', n); }catch(e){}
+  renderRooms(); if(curTab==='room') loadRoomDay(); render();
+}
+function setDate(d){
+  if(!d) return;
+  if(curTab==='room' && rdDirty && !confirm('Room check not saved. Change date anyway? · မသိမ်းရသေးပါ။')) { document.getElementById('date').value=curDate; return; }
+  curDate=d; document.getElementById('date').value=d;
+  if(curTab==='room') loadRoomDay();
+  render();
+}
+function shiftDate(n){ setDate(addDays(curDate, n)); }
+function render(){
+  if(curTab==='groups') renderGroups();
+  else if(curTab==='cages') renderCages();
+  else if(curTab==='room') renderRoom();
+  else if(curTab==='stats') loadStats(false);
+  else if(curTab==='history') renderHistory();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// BREEDING GROUPS — cage grid
+// ══════════════════════════════════════════════════════════════════
+function cageRecords(room, cage){
+  var out=[];
+  Object.keys(DB.cage).forEach(function(k){ var o=DB.cage[k]; if(o.room==room && o.cage==cage) out.push(o); });
+  return out;
+}
+// newest record for a cage on or before a date (local data + the Sheet's latest)
+function latestCage(room, cage, onOrBefore){
+  var best=null;
+  cageRecords(room,cage).forEach(function(o){ if(o.date<=onOrBefore && (!best || o.date>best.date)) best=o; });
+  var L = LATEST[room+'|'+cage];
+  if(L && L.date<=onOrBefore && (!best || L.date>best.date)) best=L;
+  return best;
+}
+// ── EGG LAYING (each entry = one female that laid; n = her 1st, 2nd, 3rd… time) ──
+function ordinal(n){ n=+n; return n===1?'1st':n===2?'2nd':n===3?'3rd':n+'th'; }
+var ORD_MY={1:'ပထမအကြိမ်',2:'ဒုတိယအကြိမ်',3:'တတိယအကြိမ်',4:'စတုတ္ထနှင့်အထက်'};
+function laidKey(n){ n=Math.round(num(n)); return n>=4?4:(n<1?1:n); }
+function laidStr(o){
+  var c={}; (o.laid||[]).forEach(function(l){ var k=laidKey(l.n); c[k]=(c[k]||0)+1; });
+  return [1,2,3,4].filter(function(k){ return c[k]; }).map(function(k){ return (k===4?'4th+':ordinal(k))+'×'+c[k]; }).join(', ') +
+    ((o.laid||[]).some(function(l){ return l.id; }) ? ' ('+(o.laid||[]).map(function(l){ return l.id; }).filter(Boolean).join(', ')+')' : '');
+}
+// Summary per female group (G1–G6) for one room.
+// rangeRecs: cage records whose laying / findings count (dated from–to).
+// The cage's current pairing info comes from its newest record up to "to".
+function groupSummary(room, from, to, rangeRecs, extraRecs){
+  var out={};
+  var G=function(k){ k=k||'No group'; if(!out[k]) out[k]={grp:k,cages:0,F:0,M:0,pairs:0,clutches:0,poor:0,laid:0,ev:0,n:{1:0,2:0,3:0,4:0},found:0,checks:0,_ids:{}}; return out[k]; };
+  var pool=rangeRecs.concat(extraRecs||[]).filter(function(o){ return o.room==room && o.date<=to; });
+  for(var c=1;c<=roomCages(room);c++){
+    var best=null;
+    pool.forEach(function(o){ if(o.cage==c && (!best||o.date>best.date)) best=o; });
+    var L=LATEST[room+'|'+c]; if(L && L.date<=to && (!best||L.date>best.date)) best=L;
+    if(!best) continue;
+    var g=G(best.fGroup); g.cages++; g.F+=num(best.females); g.M+=num(best.males); g.clutches+=num(best.clutches);
+    if(best.paired && !best.apart) g.pairs++; if(best.cond==='Poor') g.poor++;
+  }
+  var seen={};
+  rangeRecs.forEach(function(o){
+    if(o.room!=room || o.date<from || o.date>to) return;
+    var k=keyOf('cage',o); if(seen[k]) return; seen[k]=1;
+    var g=G(o.fGroup); g.checks++; g.found+=(o.found||[]).length;
+    (o.laid||[]).forEach(function(l){
+      g.ev++; g.n[laidKey(l.n)]++;
+      if(l.id){ if(!g._ids[l.id]){ g._ids[l.id]=1; g.laid++; } } else g.laid++;
+    });
+  });
+  var order=GROUPS.concat(['No group']);
+  var rows=order.filter(function(k){ return out[k]; }).map(function(k){ return out[k]; });
+  var tot={grp:'Room total',cages:0,F:0,M:0,pairs:0,clutches:0,poor:0,laid:0,ev:0,n:{1:0,2:0,3:0,4:0},found:0,checks:0};
+  rows.forEach(function(r){ ['cages','F','M','pairs','clutches','poor','laid','ev','found','checks'].forEach(function(f){ tot[f]+=r[f]; }); [1,2,3,4].forEach(function(k){ tot.n[k]+=r.n[k]; }); });
+  return {rows:rows, tot:tot};
+}
+function groupTable(gs, compact){
+  if(!gs.rows.length) return '<div class="empty">No cages with a group yet — set ♀ Group # in the cage checks. · အုပ်စု မသတ်မှတ်ရသေး</div>';
+  var pct=function(r){ return r.F ? Math.round(r.laid/r.F*100)+'%' : '—'; };
+  var head='<tr><th>Group<br><span class="my">အုပ်စု</span></th><th>Cages</th><th>♀</th><th>♂</th>'+
+    '<th>🥚 ♀ laid<br><span class="my">ဥချသော အမ</span></th><th>1st time<br><span class="my">ပထမ</span></th><th>2nd time<br><span class="my">ဒုတိယ</span></th><th>3rd time<br><span class="my">တတိယ</span></th><th>4th+<br><span class="my">စတုတ္ထ+</span></th>'+
+    '<th>% of ♀ laid</th>'+(compact?'':'<th>Clutches (pairing)<br><span class="my">ဥအုပ်</span></th><th>Found<br><span class="my">တွေ့ရှိ</span></th><th>Poor</th>')+'</tr>';
+  var line=function(r,cls){
+    return '<tr'+(cls?' class="'+cls+'"':'')+'><td class="g">'+esc(r.grp)+'</td><td>'+r.cages+'</td><td>'+r.F+'</td><td>'+r.M+'</td>'+
+      '<td class="lay">'+r.laid+'</td><td>'+(r.n[1]||'—')+'</td><td>'+(r.n[2]||'—')+'</td><td>'+(r.n[3]||'—')+'</td><td>'+(r.n[4]||'—')+'</td>'+
+      '<td>'+pct(r)+'</td>'+(compact?'':'<td>'+r.clutches+'</td><td'+(r.found?' style="color:var(--red-dk);font-weight:800"':'')+'>'+r.found+'</td><td>'+(r.poor||'—')+'</td>')+'</tr>';
+  };
+  return '<div class="tbl-wrap"><table class="t gt"><thead>'+head+'</thead><tbody>'+gs.rows.map(function(r){ return line(r); }).join('')+line(gs.tot,'tot')+'</tbody></table></div>';
+}
+function findCount(o){ return (o && o.found) ? o.found.length : 0; }
+
+function renderCages(){
+  var room=curRoom, n=roomCages(room), ws=weekStart(curDate), we=addDays(ws,6);
+  var today=0, week=0, F=0, M=0, pairs=0, clutches=0, foundToday=0, poor=0;
+  var tiles='';
+  for(var c=1;c<=n;c++){
+    var recs=cageRecords(room,c);
+    var tRec=null, wRec=false;
+    recs.forEach(function(o){ if(o.date===curDate) tRec=o; if(o.date>=ws && o.date<=we) wRec=true; });
+    var L=latestCage(room,c,curDate);
+    if(tRec) today++; if(wRec) week++;
+    if(L){ F+=num(L.females); M+=num(L.males); clutches+=num(L.clutches); if(L.paired && !L.apart) pairs++; if(L.cond==='Poor') poor++; }
+    var fc=findCount(tRec); foundToday+=fc;
+    var cls='cage'+(tRec?' today':(wRec?' week':''))+(L&&L.cond==='Poor'?' poor':'');
+    var st = tRec ? '✓ '+(tRec.start ? tRec.start+(tRec.end?'–'+tRec.end:'') : 'checked') : (wRec?'✓ this week':(L?'last '+L.date.slice(5):'not checked'));
+    var lc=tRec&&tRec.laid?tRec.laid.length:0;
+    tiles+='<div class="'+cls+'" onclick="openCage('+c+')">'+(fc?'<span class="fb">'+fc+'</span>':'')+(lc?'<span class="lb">🥚'+lc+'</span>':'')+
+      '<div class="no">'+c+'</div>'+
+      '<div class="sx">'+(L?'♀'+num(L.females)+' ♂'+num(L.males):'—')+'</div>'+
+      '<div class="st">'+esc(st)+'</div></div>';
+  }
+  var pct=function(a){ return Math.round(a/n*100); };
+  var h='<div class="card"><div class="card-h"><span class="card-t">INFR#'+room+' — '+n+' cages · <span class="my">လှောင်အိမ် '+n+' ခု</span></span>'+
+    '<span class="chip">'+esc(curDate)+'</span></div><div class="card-b">'+
+    '<div class="prog">'+
+      '<div><span class="lbl">Checked today · <span class="my">ယနေ့ စစ်ပြီး</span></span><div style="display:flex;gap:8px;align-items:center"><div class="bar"><i style="width:'+pct(today)+'%"></i></div><b>'+today+' / '+n+'</b></div></div>'+
+      '<div><span class="lbl">Checked this week (Mon–Sun) · <span class="my">ဤအပတ် စစ်ပြီး</span></span><div style="display:flex;gap:8px;align-items:center"><div class="bar"><i style="width:'+pct(week)+'%;background:#8bd17f"></i></div><b>'+week+' / '+n+'</b></div></div>'+
+      (week<n && curDate>=addDays(ws,5) ? '<span class="chip a">⚠️ '+(n-week)+' cages still to check this week · ဤအပတ် မစစ်ရသေး</span>' : '')+
+    '</div></div></div>';
+  h+='<div class="strip">'+
+    stat(F,'♀ Females · အမ')+stat(M,'♂ Males · အထီး')+stat(pairs,'Active pairs · တွဲထားဆဲ')+
+    stat(clutches,'Clutches · ဥအုပ်')+stat(foundToday,'Found today · ယနေ့တွေ့ရှိ', foundToday?'#e02424':'')+stat(poor,'Poor cages · အခြေအနေညံ့', poor?'#d97706':'')+
+  '</div>';
+  h+='<div class="card"><div class="card-h"><span class="card-t">Tap a cage to check it · <span class="my">စစ်ဆေးရန် လှောင်အိမ်ကို နှိပ်ပါ</span></span></div><div class="card-b">'+
+    '<div class="cage-grid">'+tiles+'</div>'+
+    '<div class="legend"><span><i style="border-color:var(--green);background:#f1fbef"></i>Checked today · ယနေ့စစ်ပြီး</span>'+
+    '<span><i style="border-color:#a7dca0"></i>Checked this week · ဤအပတ်စစ်ပြီး</span>'+
+    '<span><i></i>Not this week · မစစ်ရသေး</span>'+
+    '<span><i style="box-shadow:inset 4px 0 0 var(--amber)"></i>Poor condition · ညံ့</span>'+
+    '<span><b style="background:var(--red);color:#fff;border-radius:8px;padding:0 5px">2</b> animals found today · တွေ့ရှိ</span>'+
+    '<span><b style="background:#1a7f37;color:#fff;border-radius:8px;padding:0 5px">🥚1</b> females laid today · ဥချ</span></div>'+
+  '</div></div>';
+  var allRecs=Object.keys(DB.cage).map(function(k){ return DB.cage[k]; });
+  var gs=groupSummary(room, ws, curDate, allRecs);
+  h+='<div class="card"><div class="card-h"><span class="card-t">📋 Groups in INFR#'+room+' — this week · <span class="my">အုပ်စုအလိုက် အနှစ်ချုပ် — ဤအပတ်</span></span>'+
+     '<span class="chip">'+esc(ws)+' → '+esc(curDate)+'</span>'+
+     '<button class="btn sm" style="margin-left:auto" onclick="showTab(\'stats\')">All rooms · any dates ›</button></div>'+
+     '<div class="card-b" style="padding:0">'+groupTable(gs,false)+'</div></div>';
+  document.getElementById('page-cages').innerHTML=h;
+}
+function stat(v,l,col){ return '<div class="stat"><b'+(col?' style="color:'+col+'"':'')+'>'+v+'</b><span>'+l+'</span></div>'; }
+
+// ══════════════════════════════════════════════════════════════════
+// 🏆 BREEDING GROUPS G1–G6 — first page: every room's data added up per group
+// ══════════════════════════════════════════════════════════════════
+var GROUP_COLORS={G1:'#1877f2',G2:'#0e9f6e',G3:'#7c3aed',G4:'#e8590c',G5:'#d6336c',G6:'#0891b2',Unknown:'#6b7280','No group':'#9ca3af'};
+var gRange='week';
+var G_RANGES=[{k:'week',l:'This week',my:'ဤအပတ်'},{k:'7',l:'Last 7 days',my:'၇ ရက်'},{k:'14',l:'Last 14 days',my:'၁၄ ရက်'},{k:'21',l:'Last 21 days',my:'၂၁ ရက်'}];
+function setGRange(k){ gRange=k; renderGroups(); }
+function renderGroups(){
+  var to=todayStr(), from = gRange==='week' ? weekStart(to) : addDays(to, -(+gRange-1));
+  var recs=Object.keys(DB.cage).map(function(k){ return DB.cage[k]; });
+  var order=GROUPS.concat(['No group']);
+  var G={};
+  order.forEach(function(k){ G[k]={grp:k,cages:0,F:0,M:0,pairs:0,clutches:0,laid:0,n:{1:0,2:0,3:0,4:0},found:0,poor:0,rooms:{}}; });
+  ROOMS.forEach(function(R){
+    groupSummary(R.n, from, to, recs).rows.forEach(function(r){
+      var g=G[r.grp]; if(!g) return;
+      ['cages','F','M','pairs','clutches','laid','found','poor'].forEach(function(f){ g[f]+=r[f]; });
+      [1,2,3,4].forEach(function(k){ g.n[k]+=r.n[k]; });
+      g.rooms[R.n]={F:r.F,M:r.M,cages:r.cages,clutches:r.clutches,laid:r.laid};
+    });
+  });
+  var T={F:0,M:0,cages:0,clutches:0,laid:0,pairs:0};
+  order.forEach(function(k){ ['F','M','cages','clutches','laid','pairs'].forEach(function(f){ T[f]+=G[k][f]; }); });
+  var pct=function(a,b){ return b?Math.round(a/b*100)+'%':'—'; };
+
+  var h='<div class="card"><div class="card-h"><span class="card-t">🏆 Breeding Groups G1–G6 — all 4 rooms · <span class="my">မွေးမြူရေးအုပ်စု ၁–၆ — အခန်း ၄ ခုလုံး</span></span>'+
+    '<span class="chip">From the latest cage checks in INFR#1–#4 · နောက်ဆုံး စစ်ဆေးမှုများမှ</span></div>'+
+    '<div class="card-b"><span class="lbl">Eggs laid in · <span class="my">ဥချသည့် ကာလ</span></span><div class="seg" style="max-width:560px">'+
+    G_RANGES.map(function(r){ return '<button class="'+(gRange===r.k?'on ok':'')+'" onclick="setGRange(\''+r.k+'\')">'+r.l+'<span class="my">'+r.my+'</span></button>'; }).join('')+
+    '</div><div style="font-size:11.5px;color:var(--muted);margin-top:6px">'+esc(from)+' → '+esc(to)+' · Females, males and clutches = what is in the cages now. Clutches = collected from the current pairings. · အမ၊ အထီး၊ ဥအုပ် = ယခု လှောင်အိမ်ရှိ</div></div></div>';
+
+  h+='<div class="gdash-top">'+
+    '<div class="gbig" style="background:#d6336c"><b>'+T.F+'</b><span>♀ Total females · အမ စုစုပေါင်း</span></div>'+
+    '<div class="gbig" style="background:#1a7f37"><b>'+T.clutches+'</b><span>🥚 Total clutches · ဥအုပ် စုစုပေါင်း</span></div>'+
+    '<div class="gbig" style="background:#e8590c"><b>'+T.laid+'</b><span>♀ Laid ('+esc(G_RANGES.filter(function(r){return r.k===gRange;})[0].l.toLowerCase())+') · ဥချသော အမ</span></div>'+
+    '<div class="gbig" style="background:#7c3aed"><b>'+pct(T.laid,T.F)+'</b><span>% of females laid · ဥချ %</span></div>'+
+    '<div class="gbig" style="background:#1877f2"><b>'+T.M+'</b><span>♂ Total males · အထီး</span></div>'+
+    '<div class="gbig" style="background:#475569"><b>'+(T.F?Math.round(T.clutches/T.F*100)/100:'—')+'</b><span>Clutches per female · အမ တစ်ကောင်လျှင်</span></div>'+
+  '</div>';
+
+  h+='<div class="gcards">';
+  order.forEach(function(k){
+    var g=G[k], col=GROUP_COLORS[k];
+    if((k==='Unknown'||k==='No group') && !g.cages && !g.laid) return;
+    var tot=g.n[1]+g.n[2]+g.n[3]+g.n[4];
+    var seg=function(n,c){ return tot&&g.n[n]?'<i style="width:'+(g.n[n]/tot*100)+'%;background:'+c+'"></i>':''; };
+    h+='<div class="gcard'+(g.cages?'':' empty')+'">'+
+      '<div class="gcard-h" style="background:'+col+'"><span class="gn">'+esc(k==='No group'?'—':k)+'</span>'+
+        '<span class="gs">'+(k==='No group'?'No group set · အုပ်စု မသတ်မှတ်':'Group '+k.replace('G','')+' · အုပ်စု '+k.replace('G',''))+'<br>'+g.cages+' cages · '+g.pairs+' active pairs</span></div>'+
+      '<div class="gnums"><div class="gnum"><b style="color:#d6336c">'+g.F+'</b><span>♀ Females · အမ</span></div>'+
+        '<div class="gnum"><b style="color:#1a7f37">'+g.clutches+'</b><span>🥚 Clutches · ဥအုပ်</span></div></div>'+
+      '<div class="gmini"><div><b>'+g.M+'</b><span>♂ Males<br>အထီး</span></div><div><b style="color:#e8590c">'+g.laid+'</b><span>♀ Laid<br>ဥချ</span></div>'+
+        '<div><b>'+pct(g.laid,g.F)+'</b><span>% laid<br>ဥချ %</span></div><div><b>'+(g.F?Math.round(g.clutches/g.F*100)/100:'—')+'</b><span>Clutch / ♀<br>တစ်ကောင်လျှင်</span></div></div>'+
+      '<div class="glay"><span class="lbl">Times laid · <span class="my">ဥချသည့် အကြိမ်</span></span>'+
+        '<div class="bar2">'+seg(1,'#40c057')+seg(2,'#1c7ed6')+seg(3,'#f59f00')+seg(4,'#e03131')+'</div>'+
+        '<div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip" style="color:#2b8a3e">1st: '+g.n[1]+'</span><span class="chip" style="color:#1864ab">2nd: '+g.n[2]+'</span><span class="chip" style="color:#e67700">3rd: '+g.n[3]+'</span><span class="chip" style="color:#c92a2a">4th+: '+g.n[4]+'</span>'+
+        (g.found?'<span class="chip r">🔍 '+g.found+' found</span>':'')+(g.poor?'<span class="chip a">'+g.poor+' poor cages</span>':'')+'</div></div>'+
+      '<div class="grooms"><table><tr><th>Room</th><th>Cages</th><th>♀</th><th>♂</th><th>🥚 Clutches</th><th>♀ Laid</th></tr>'+
+        ROOMS.map(function(R){ var r=g.rooms[R.n]; return '<tr><td>INFR#'+R.n+'</td>'+(r?'<td>'+r.cages+'</td><td>'+r.F+'</td><td>'+r.M+'</td><td><b>'+r.clutches+'</b></td><td>'+r.laid+'</td>':'<td colspan="5" style="color:var(--muted)">—</td>')+'</tr>'; }).join('')+
+      '</table></div></div>';
+  });
+  h+='</div>';
+  h+='<div class="charts">'+
+    '<div class="card"><div class="card-h"><span class="card-t">♀ Females per group · <span class="my">အုပ်စုအလိုက် အမ</span></span></div><div class="card-b"><div class="chart-box"><canvas id="g-fem"></canvas></div></div></div>'+
+    '<div class="card"><div class="card-h"><span class="card-t">🥚 Clutches per group · <span class="my">အုပ်စုအလိုက် ဥအုပ်</span></span></div><div class="card-b"><div class="chart-box"><canvas id="g-clu"></canvas></div></div></div>'+
+  '</div>';
+  if(!T.cages) h+='<div class="prefill">No cage checks yet — once staff check cages and set the ♀ Group # in 🦎 Cage Checks, every group fills in here. · လှောင်အိမ် စစ်ဆေးမှု မရှိသေးပါ</div>';
+  document.getElementById('page-groups').innerHTML=h;
+  if(typeof Chart!=='undefined'){
+    ['gfem','gclu'].forEach(function(k){ if(charts[k]){ charts[k].destroy(); delete charts[k]; } });
+    var labels=GROUPS.slice(0,6);
+    var ds=function(field){ return ROOMS.map(function(R,i){ return {label:'INFR#'+R.n, data:labels.map(function(k){ var r=G[k].rooms[R.n]; return r?r[field]:0; }), backgroundColor:ROOM_COLORS[i]}; }); };
+    var opt={responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true,ticks:{precision:0}}}};
+    charts.gfem=new Chart(document.getElementById('g-fem'),{type:'bar',data:{labels:labels,datasets:ds('F')},options:opt});
+    charts.gclu=new Chart(document.getElementById('g-clu'),{type:'bar',data:{labels:labels,datasets:ds('clutches')},options:opt});
+  }
+}
+
+// ── CAGE EDITOR ──────────────────────────────────────────────────
+function openCage(c){
+  var key=curRoom+'|'+c+'|'+curDate;
+  var saved=DB.cage[key];
+  if(saved){ editing=clone(saved); editing._from=''; }
+  else {
+    editing={room:curRoom, cage:c, date:curDate, found:[], notes:'', start:'', end:''};
+    var L=latestCage(curRoom,c,addDays(curDate,-1));
+    if(L){ PAIR_FIELDS.forEach(function(f){ if(L[f]!=null) editing[f]=L[f]; }); editing._from=L.date; }
+  }
+  if(!editing.found) editing.found=[];
+  if(!editing.laid) editing.laid=[];
+  editingDirty=false;
+  renderCageForm();
+  document.getElementById('cage-ov').classList.add('open');
+}
+function closeCage(force){
+  if(!force && editingDirty && !confirm('Not saved. Close anyway? · မသိမ်းရသေးပါ။ ပိတ်မလား?')) return;
+  document.getElementById('cage-ov').classList.remove('open'); editing=null; renderCages();
+}
+function moveCage(d){
+  if(!editing) return;
+  if(editingDirty && !confirm('Not saved. Move anyway? · မသိမ်းရသေးပါ။')) return;
+  var n=roomCages(curRoom), c=editing.cage+d; if(c<1) c=n; if(c>n) c=1;
+  openCage(c);
+}
+function setE(k,v){ editing[k]=v; editingDirty=true; if(k==='start'||k==='end') updMins(); }
+function updMins(){ var el=document.getElementById('e-mins'); if(el){ var m=mins(editing.start,editing.end); el.textContent=m==null?'—':m+' min'; } }
+function stampTime(k){ editing[k]=nowHM(); editingDirty=true; var el=document.getElementById('e-'+k); el.value=editing[k]; el.classList.remove('bad'); el.nextElementSibling.textContent=to12(editing[k]); updMins(); }
+function stepE(k,d){ var v=Math.max(0,num(editing[k])+d); editing[k]=v; editingDirty=true; document.getElementById('e-'+k).value=v; }
+function addLaid(n){ editing.laid.push({n:n, id:''}); editing.clutches=num(editing.clutches)+1; editingDirty=true; renderCageForm(); }
+function setLaid(i,k,v){ editing.laid[i][k]= k==='n'?+v:v; editingDirty=true; }
+function delLaid(i){ editing.laid.splice(i,1); editing.clutches=Math.max(0,num(editing.clutches)-1); editingDirty=true; renderCageForm(); }
+function setCond(k){ editing.cond = editing.cond===k?'':k; editingDirty=true; renderCageForm(); }
+function pickE(k){ openGenePicker(editing[k], function(v){ editing[k]=v; editingDirty=true; renderCageForm(); }); }
+function addFind(t){ editing.found.push({t:t, s:'', w:'', m:''}); editingDirty=true; renderCageForm(); }
+function setF(i,k,v,rerender){ editing.found[i][k]=v; editingDirty=true; if(rerender) renderCageForm(); }
+function delF(i){ editing.found.splice(i,1); editingDirty=true; renderCageForm(); }
+function pickF(i){ openGenePicker(editing.found[i].m, function(v){ editing.found[i].m=v; editingDirty=true; renderCageForm(); }); }
+
+function renderCageForm(){
+  var e=editing, body=document.getElementById('cage-body');
+  var keepScroll=body.scrollTop;
+  document.getElementById('cage-title').innerHTML='INFR#'+e.room+' · Cage '+e.cage+' <span class="my">လှောင်အိမ် '+e.cage+'</span><div class="my" style="font-size:12px">'+esc(e.date)+'</div>';
+  var inp=function(k,type,ph,extra){ return '<input class="in" id="e-'+k+'" type="'+type+'" value="'+esc(e[k]==null?'':e[k])+'" placeholder="'+(ph||'')+'" '+(extra||'')+' oninput="setE(\''+k+'\',this.value)">'; };
+  var sel=function(k){ return '<select class="in" onchange="setE(\''+k+'\',this.value)"><option value="">— Group · အုပ်စု —</option>'+GROUPS.map(function(g){ return '<option'+(e[k]===g?' selected':'')+'>'+g+'</option>'; }).join('')+'</select>'; };
+  var counts={}; e.found.forEach(function(f){ counts[f.t]=(counts[f.t]||0)+1; });
+  var h='';
+  if(e._from) h+='<div class="prefill">📋 Pairing info copied from the last check ('+esc(e._from)+'). Check it and change anything that\'s different. · ယခင်စစ်ဆေးမှုမှ ကူးထားသည်</div>';
+
+  h+='<div class="sec">⏱ Check time · <span class="my">စစ်ဆေးချိန်</span></div>'+
+    '<div class="g3">'+
+      '<div><span class="lbl">Start · <span class="my">စတင်ချိန်</span></span><div class="timebox">'+tbox('e','start',e.start,'e-start')+'<button class="btn sm" onclick="stampTime(\'start\')">▶ Now</button></div></div>'+
+      '<div><span class="lbl">End · <span class="my">ပြီးဆုံးချိန်</span></span><div class="timebox">'+tbox('e','end',e.end,'e-end')+'<button class="btn sm" onclick="stampTime(\'end\')">⏹ Now</button></div></div>'+
+      '<div><span class="lbl">Time taken · <span class="my">ကြာချိန်</span></span><div class="in" id="e-mins" style="font-weight:800">—</div></div>'+
+    '</div>';
+
+  h+='<div class="sec">💕 Breeding group · <span class="my">မွေးမြူရေးအုပ်စု</span></div>'+
+    '<div class="g2">'+
+      '<div class="fld"><span class="lbl">♀ Females (amount) · <span class="my">အမ အရေအတွက်</span></span><div class="stepper"><button class="btn" onclick="stepE(\'females\',-1)">−</button>'+inp('females','number','0','min="0" inputmode="numeric"')+'<button class="btn" onclick="stepE(\'females\',1)">+</button></div></div>'+
+      '<div class="fld"><span class="lbl">♂ Males (amount) · <span class="my">အထီး အရေအတွက်</span></span><div class="stepper"><button class="btn" onclick="stepE(\'males\',-1)">−</button>'+inp('males','number','0','min="0" inputmode="numeric"')+'<button class="btn" onclick="stepE(\'males\',1)">+</button></div></div>'+
+      '<div class="fld"><span class="lbl">♀ Female morph · <span class="my">အမ အရောင်</span></span>'+morphBox(e.fMorph,"pickE('fMorph')")+'</div>'+
+      '<div class="fld"><span class="lbl">♂ Male morph · <span class="my">အထီး အရောင်</span></span>'+morphBox(e.mMorph,"pickE('mMorph')")+'</div>'+
+      '<div class="fld"><span class="lbl">♀ Female group # · <span class="my">အမ အုပ်စု</span></span>'+sel('fGroup')+'</div>'+
+      '<div class="fld"><span class="lbl">♂ Male group # · <span class="my">အထီး အုပ်စု</span></span>'+sel('mGroup')+'</div>'+
+      '<div class="fld"><span class="lbl">Date paired together · <span class="my">တွဲပေးသည့်ရက်</span></span>'+inp('paired','date')+'</div>'+
+      '<div class="fld"><span class="lbl">Date taken apart · <span class="my">ခွဲထုတ်သည့်ရက်</span></span>'+inp('apart','date')+'</div>'+
+      '<div class="fld"><span class="lbl">🥚 Clutches collected (this pairing) · <span class="my">ဥအုပ် ရရှိမှု</span></span><div class="stepper"><button class="btn" onclick="stepE(\'clutches\',-1)">−</button>'+inp('clutches','number','0','min="0" inputmode="numeric"')+'<button class="btn" onclick="stepE(\'clutches\',1)">+</button></div></div>'+
+      '<div class="fld"><span class="lbl">Overall cage condition · <span class="my">လှောင်အိမ် အခြေအနေ</span></span><div class="seg">'+
+        CONDS.map(function(c){ return '<button class="'+c.cls+(e.cond===c.k?' on':'')+'" onclick="setCond(\''+c.k+'\')">'+c.k+'<span class="my">'+c.my+'</span></button>'; }).join('')+'</div></div>'+
+    '</div>';
+
+  h+='<div class="sec">🥚 Females that laid eggs today · <span class="my">ယနေ့ ဥချသော အမများ</span> '+
+     (e.laid.length?'<span class="chip g">'+e.laid.length+' laid</span>':'')+'</div>'+
+    '<div style="font-size:12px;color:var(--muted);margin-bottom:6px">Tap once for each female that laid: is it her 1st, 2nd, 3rd… time? Each tap also adds 1 to Clutches collected. Female ID is optional. · ဥချသော အမ တစ်ကောင်ချင်း — ဘယ်နှကြိမ်မြောက်လဲ ရွေးပါ</div>'+
+    '<div class="ftypes">'+[1,2,3,4].map(function(n){
+      return '<button class="laybtn" onclick="addLaid('+n+')">＋ '+(n===4?'4th+':ordinal(n))+' time<small>'+ORD_MY[n]+'</small></button>';
+    }).join('')+'</div>'+
+    e.laid.map(function(l,i){
+      return '<div class="lrow"><span class="tag">🥚</span>'+
+        '<select class="in" onchange="setLaid('+i+',\'n\',this.value)">'+[1,2,3,4,5,6,7,8].map(function(n){ return '<option value="'+n+'"'+(laidKey(l.n)===n||num(l.n)===n?' selected':'')+'>'+ordinal(n)+' time</option>'; }).join('')+'</select>'+
+        '<input class="in" inputmode="numeric" placeholder="Female ID (optional) · နံပါတ်" value="'+esc(l.id||'')+'" oninput="setLaid('+i+',\'id\',this.value)">'+
+        '<button class="x" onclick="delLaid('+i+')">✕</button></div>';
+    }).join('');
+
+  h+='<div class="sec">🔍 Animals found · <span class="my">တွေ့ရှိသော တိရစ္ဆာန်များ</span> '+
+     (e.found.length?'<span class="chip r">'+e.found.length+' found</span>':'<span class="chip g">None found · မတွေ့ပါ</span>')+'</div>'+
+    '<div style="font-size:12px;color:var(--muted);margin-bottom:6px">Tap a type to add one animal, then fill in its sex, weight and morph. · အမျိုးအစားကို နှိပ်၍ တစ်ကောင်ချင်း ထည့်ပါ</div>'+
+    '<div class="ftypes">'+FIND.map(function(f){
+      return '<button class="ftype" style="border-color:'+f.c+';color:'+f.c+'" onclick="addFind(\''+f.k+'\')">＋ '+f.k+(counts[f.k]?' ('+counts[f.k]+')':'')+'<small>'+f.en+' · '+f.my+'</small></button>';
+    }).join('')+'</div>';
+  e.found.forEach(function(f,i){
+    var d=findDef(f.t);
+    h+='<div class="frow">'+
+      '<div class="tag" style="background:'+d.c+'">'+d.k+'</div>'+
+      '<div class="seg">'+[['M','♂'],['F','♀'],['?','?']].map(function(s){ return '<button class="'+(f.s===s[0]?'on ok':'')+'" onclick="setF('+i+',\'s\',\''+s[0]+'\',true)">'+s[1]+'</button>'; }).join('')+'</div>'+
+      '<input class="in" type="number" min="0" inputmode="decimal" placeholder="g" value="'+esc(f.w)+'" oninput="setF('+i+',\'w\',this.value)" title="Weight (g) · အလေးချိန်">'+
+      morphBox(f.m,'pickF('+i+')')+
+      '<button class="x" onclick="delF('+i+')" title="Remove">✕</button></div>';
+  });
+  if(e.found.length) h+='<div style="font-size:10.5px;color:var(--muted);margin-top:-2px">Type · Sex (♂/♀) · Weight g · Morph — <span class="my">အမျိုးအစား · လိင် · အလေးချိန် · အရောင်</span></div>';
+
+  h+='<div class="sec">📝 Notes · <span class="my">မှတ်ချက်</span></div>'+
+    '<textarea class="in" rows="3" placeholder="Anything about this cage… · ဤလှောင်အိမ်အကြောင်း" oninput="setE(\'notes\',this.value)">'+esc(e.notes||'')+'</textarea>';
+  body.innerHTML=h;
+  body.scrollTop=keepScroll;
+  updMins();
+}
+function saveCage(next){
+  if(!editing) return;
+  if(!emp()){ showToast('Enter your name at the top first · နာမည်ထည့်ပါ','err'); return; }
+  if(editing.start && !editing.end) editing.end=nowHM();
+  var o=clone(editing); delete o._from;
+  o.females=o.females===''||o.females==null?'':num(o.females);
+  o.males=o.males===''||o.males==null?'':num(o.males);
+  o.clutches=o.clutches===''||o.clutches==null?'':num(o.clutches);
+  o.found=(o.found||[]).filter(function(f){ return f.t; });
+  o.laid=(o.laid||[]).map(function(l){ return {n:num(l.n)||1, id:String(l.id||'').trim()}; });
+  saveRecord('cage', o);
+  editingDirty=false;
+  showToast('✅ Cage '+o.cage+' saved · သိမ်းပြီး','ok');
+  if(next){
+    var n=roomCages(curRoom);
+    if(o.cage<n) openCage(o.cage+1); else { closeCage(true); showToast('✅ Last cage done · နောက်ဆုံး လှောင်အိမ် ပြီးပါပြီ','ok'); }
+  } else closeCage(true);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ROOM CHECK — hourly readings + appliances
+// ══════════════════════════════════════════════════════════════════
+function emptyRoomDay(room,date){
+  return {room:room, date:date, notes:'',
+    hvac:[{},{},{}], hps:{periods:[{on:'',off:''}],broken:[]}, mh:{periods:[{on:'',off:''}],cages:[]}, lights:{periods:[{on:'',off:''}]},
+    aisles:{L:'',M:'',R:''}, lightNotes:'', fans:[{},{}], exhaust:{}, changes:[]};
+}
+function prevRoomDay(room, beforeDate){
+  var best=null;
+  Object.keys(DB.roomday).forEach(function(k){ var o=DB.roomday[k]; if(o.room==room && o.date<beforeDate && (!best||o.date>best.date)) best=o; });
+  return best;
+}
+function loadRoomDay(){
+  var saved=DB.roomday[curRoom+'|'+curDate];
+  if(saved){ RD=clone(saved); RD._from=''; }
+  else {
+    var p=prevRoomDay(curRoom,curDate);
+    if(p){
+      RD=clone(p); RD.date=curDate; RD.notes=''; RD.lightNotes=''; RD.changes=[]; RD._from=p.date;
+      (RD.hvac||[]).forEach(function(u){ u.n=''; });
+      (RD.fans||[]).forEach(function(u){ u.n=''; });
+      if(RD.exhaust) RD.exhaust.n='';
+    } else RD=emptyRoomDay(curRoom,curDate);
+  }
+  var base=emptyRoomDay(curRoom,curDate);
+  Object.keys(base).forEach(function(k){ if(RD[k]==null) RD[k]=base[k]; });
+  while(RD.hvac.length<3) RD.hvac.push({});
+  while(RD.fans.length<2) RD.fans.push({});
+  if(!RD.hps.broken) RD.hps.broken=[];
+  if(!RD.mh.cages) RD.mh.cages=[];
+  ['hps','mh','lights'].forEach(function(k){
+    var ps=periodsOf(RD[k]).map(function(p){ return {on:p.on||'', off:p.off||''}; });
+    if(!ps.length) ps=[{on:'',off:''}];
+    RD[k].periods=ps; delete RD[k].on; delete RD[k].off;
+  });
+  rdDirty=false; readingDraft={};
+}
+function setRD(p,v){ setPath(RD,p,v); rdDirty=true; updRoomDerived(); }
+function segRD(p,v){ setPath(RD,p, getPath(RD,p)===v?'':v); rdDirty=true; renderRoom(); }
+function nowRD(p){ setPath(RD,p,nowHM()); rdDirty=true; renderRoom(); }
+function cleanedToday(i){ RD.hvac[i].clean=curDate; rdDirty=true; renderRoom(); }
+function toggleBulb(n){
+  var b=RD.hps.broken, i=b.indexOf(n);
+  if(i>=0) b.splice(i,1); else { b.push(n); b.sort(function(x,y){return x-y;}); }
+  rdDirty=true; renderRoom();
+}
+function addPeriod(k){ RD[k].periods.push({on:'',off:''}); rdDirty=true; renderRoom(); }
+function delPeriod(k,i){ RD[k].periods.splice(i,1); if(!RD[k].periods.length) RD[k].periods.push({on:'',off:''}); rdDirty=true; renderRoom(); }
+function setMH(c,idx,v){
+  var a=RD.mh.cages; while(a.length<c) a.push(['','']);
+  if(!a[c-1]) a[c-1]=['',''];
+  a[c-1][idx]=v===''?'':+v;
+  if(idx===0 && (v==='' || +a[c-1][1] > +v)) a[c-1][1]=v===''?'':0;
+  rdDirty=true; renderRoom();
+}
+function rinp(p,type,ph,extra){
+  var v=getPath(RD,p); return '<input class="in" type="'+type+'" value="'+esc(v==null?'':v)+'" placeholder="'+(ph||'')+'" '+(extra||'')+' oninput="setRD(\''+p+'\',this.value)">';
+}
+function rseg(p, opts){
+  var v=getPath(RD,p);
+  return '<div class="seg">'+opts.map(function(o){ return '<button class="'+o.c+(v===o.k?' on':'')+'" onclick="segRD(\''+p+'\',\''+o.k+'\')">'+o.l+'<span class="my">'+o.my+'</span></button>'; }).join('')+'</div>';
+}
+var PW=[{k:'on',l:'ON',my:'ဖွင့်',c:'on_'},{k:'off',l:'OFF',my:'ပိတ်',c:'off'}];
+var PW3=[{k:'on',l:'ON',my:'ဖွင့်',c:'on_'},{k:'off',l:'OFF',my:'ပိတ်',c:'off'},{k:'broken',l:'BROKEN',my:'ပျက်',c:'bad'}];
+var ST=[{k:'ok',l:'Working OK',my:'ကောင်း',c:'ok'},{k:'problem',l:'Problem / broken',my:'ပြဿနာ / ပျက်',c:'bad'}];
+function timeIn(p){ return '<div class="timebox">'+tbox('rd',p,getPath(RD,p))+'<button class="btn sm" onclick="nowRD(\''+p+'\')">Now</button></div>'; }
+function hChip(id,x){ var h=schedHrs(x); return '<span class="chip '+(h==null?'':'b')+'" id="'+id+'">'+fmtH(h)+'</span>'; }
+
+function slotState(i){
+  var s=SLOTS[i], k=curRoom+'|'+curDate+'|'+s.t, saved=DB.reading[k];
+  var today=curDate===todayStr(), t=nowHM();
+  var next=SLOTS[i+1]?SLOTS[i+1].t:'23:59';
+  return {saved:saved, now: today && t>=s.t && t<next, missed: !saved && (curDate<todayStr() || (today && t>=(SLOTS[i+1]?next:'17:00')))};
+}
+function addMin(hm,m){ var a=hm.split(':'); var x=+a[0]*60+(+a[1])+m; return pad(Math.floor(x/60)%24)+':'+pad(x%60); }
+
+function renderRoom(){
+  if(!RD || RD.room!==curRoom || RD.date!==curDate) loadRoomDay();
+  var R=RD, n=roomCages(curRoom);
+  var page=document.getElementById('page-room');
+  var keepY=window.scrollY;
+  var h='';
+  // schedule banner
+  var t=nowHM(), isToday=curDate===todayStr(), nextS=null, curS=null;
+  SLOTS.forEach(function(s,i){ var st=slotState(i); if(st.now) curS=s; if(!nextS && s.t>t) nextS=s; });
+  var done=SLOTS.filter(function(s,i){ return slotState(i).saved; }).length;
+  if(isToday && curS && !slotState(SLOTS.indexOf(curS)).saved)
+    h+='<div class="banner now">🔔 '+curS.l+' check now — log temperature &amp; humidity <span class="my">'+curS.my+' စစ်ဆေးရန်အချိန် — အပူချိန်နှင့် စိုထိုင်းဆ မှတ်ပါ</span></div>';
+  else if(isToday && nextS)
+    h+='<div class="banner soon">🕐 Next check: '+nextS.l+' <span class="my">နောက်စစ်ဆေးချိန် — '+nextS.my+'</span> <span class="chip" style="margin-left:auto">'+done+' / 8 done · ပြီး</span></div>';
+  else h+='<div class="banner '+(done===8?'done':'')+'">'+(done===8?'✅ All 8 checks done':'📋 '+done+' / 8 checks done')+' · <span class="my">စစ်ဆေးမှု '+done+' / 8 ပြီး</span></div>';
+
+  // hourly readings
+  h+='<div class="card"><div class="card-h"><span class="card-t">🌡️ Room temperature &amp; humidity · <span class="my">အခန်း အပူချိန် နှင့် စိုထိုင်းဆ</span></span>'+
+     '<span class="chip">6 AM · 8 · 10 · 12 · 1 · 2 · 3 · 4 PM</span>'+
+     '<button class="btn pri sm" style="margin-left:auto" onclick="saveReadings()">💾 Save readings · <span class="my">သိမ်းရန်</span></button></div><div class="card-b"><div class="slots">';
+  SLOTS.forEach(function(s,i){
+    var st=slotState(i), sv=st.saved||{}, dr=readingDraft[s.t]||{};
+    var tv=dr.temp!=null?dr.temp:(sv.temp==null?'':sv.temp), hv=dr.hum!=null?dr.hum:(sv.hum==null?'':sv.hum);
+    var cls='slot'+(st.saved?' saved':(st.missed?' missed':''))+(st.now?' now':'');
+    h+='<div class="'+cls+'"><div class="tm"><span>'+s.l+'</span>'+(st.saved?'<span title="saved">✅</span>':(st.missed?'<span class="u" style="color:var(--red)">missed</span>':''))+'</div>'+
+      '<input class="in" type="number" step="0.1" inputmode="decimal" placeholder="°C" value="'+esc(tv)+'" oninput="draftR(\''+s.t+'\',\'temp\',this.value)" title="Temperature °C · အပူချိန်">'+
+      '<input class="in" type="number" step="1" inputmode="numeric" placeholder="% RH" value="'+esc(hv)+'" oninput="draftR(\''+s.t+'\',\'hum\',this.value)" title="Humidity % · စိုထိုင်းဆ">'+
+      '<div class="u">°C · % '+(sv.emp?'· '+esc(sv.emp):'')+'</div></div>';
+  });
+  h+='</div></div></div>';
+
+  if(R._from) h+='<div class="prefill">📋 Appliance settings copied from '+esc(R._from)+'. Check every item and change what\'s different, then press Save. · ယခင်ရက်မှ ကူးထားသည် — စစ်ဆေးပြီး သိမ်းပါ</div>';
+  if(DB.roomday[curRoom+'|'+curDate]) h+='<div class="chip g" style="margin-bottom:10px">✅ Room check saved for this date'+(DB.roomday[curRoom+'|'+curDate].emp?' by '+esc(DB.roomday[curRoom+'|'+curDate].emp):'')+' · သိမ်းပြီး</div>';
+
+  // room notes
+  h+='<div class="card"><div class="card-h"><span class="card-t">📝 Room notes · <span class="my">အခန်း မှတ်ချက်</span></span></div><div class="card-b">'+
+     '<textarea class="in" rows="2" placeholder="Anything about INFR#'+curRoom+' today… · ယနေ့ အခန်းအကြောင်း" oninput="setRD(\'notes\',this.value)">'+esc(R.notes||'')+'</textarea></div></div>';
+
+  // HVAC
+  h+='<div class="card"><div class="card-h"><span class="card-t">❄️ HVAC machines (3) · <span class="my">လေအေးပေးစက် (၃) လုံး</span></span></div><div class="card-b"><div class="units">';
+  [0,1,2].forEach(function(i){
+    var u=R.hvac[i]||{}, p='hvac.'+i;
+    var days = u.clean ? Math.round((parseYmd(curDate)-parseYmd(u.clean))/86400000) : null;
+    h+='<div class="unit"><div class="unit-h">HVAC #'+(i+1)+(u.st==='problem'?' <span class="chip r">⚠️ Problem</span>':'')+'</div>'+
+      '<div class="fld">'+rseg(p+'.pw',PW)+'</div>'+
+      '<div class="g2 fld"><div><span class="lbl">Set temp °C · <span class="my">သတ်မှတ်အပူချိန်</span></span>'+rinp(p+'.t','number','°C','step="0.5" inputmode="decimal"')+'</div>'+
+        '<div><span class="lbl">Set humidity % · <span class="my">သတ်မှတ် စိုထိုင်းဆ</span></span>'+rinp(p+'.h','number','%','inputmode="numeric"')+'</div></div>'+
+      '<div class="g2 fld"><div><span class="lbl">Turned ON at · <span class="my">ဖွင့်ချိန်</span></span>'+timeIn(p+'.on')+'</div>'+
+        '<div><span class="lbl">Turned OFF at · <span class="my">ပိတ်ချိန်</span></span>'+timeIn(p+'.off')+'</div></div>'+
+      '<div class="fld"><span class="lbl">Last cleaned · <span class="my">နောက်ဆုံး သန့်ရှင်းသည့်ရက်</span></span><div class="timebox">'+rinp(p+'.clean','date')+
+        '<button class="btn sm" onclick="cleanedToday('+i+')">🧽 Today</button></div>'+
+        (days!=null?'<div style="margin-top:4px"><span class="chip '+(days>14?'a':'g')+'">'+days+' days ago · ရက် '+days+' က</span></div>':'')+'</div>'+
+      '<div class="fld">'+rseg(p+'.st',ST)+'</div>'+
+      '<textarea class="in" rows="2" placeholder="Notes — broken? not cooling? · မှတ်ချက်" oninput="setRD(\''+p+'.n\',this.value)">'+esc(u.n||'')+'</textarea>'+
+    '</div>';
+  });
+  h+='</div></div></div>';
+
+  // LIGHTING
+  var prev = DB.roomday[curRoom+'|'+curDate] || prevRoomDay(curRoom,curDate);
+  var chgS=function(k){ if(!prev || prev===R) return ''; var a=schedStr(prev[k]), b=schedStr(R[k]); return (a!==b && (a||b)) ? '<div style="margin-top:4px"><span class="chip a">changed from '+esc(a||'—')+'</span></div>' : ''; };
+  var working=40-R.hps.broken.length;
+  var mhInst=0, mhBad=0, mhNone=0;
+  for(var c=1;c<=n;c++){ var mc=R.mh.cages[c-1]||[]; mhInst+=num(mc[0]); mhBad+=num(mc[1]); if(mc[0]===0) mhNone++; }
+  h+='<div class="card"><div class="card-h"><span class="card-t">💡 Lighting · <span class="my">မီး</span></span>'+
+     '<span class="chip">Every timer change is logged · အချိန်ကိုက် ပြောင်းတိုင်း မှတ်သည်</span></div><div class="card-b">'+
+     '<span class="lbl">Timer settings — one period for each time the lights come ON · <span class="my">မီးဖွင့်သည့် အချိန်တိုင်းအတွက် ထည့်ပါ</span></span>'+
+     '<div style="font-size:12px;color:var(--muted);margin-bottom:6px">Example: ON 06:00 → 12:00, then ＋ Add period: ON 14:00 → 17:00. Type times like 630, 1400 or 2pm. · ဥပမာ 06:00–12:00 နှင့် 14:00–17:00</div>'+
+     '<div class="tbl-wrap"><table class="timer-tbl"><tr><th></th><th>ON periods (ON → OFF) · <span class="my">ဖွင့်ချိန် → ပိတ်ချိန်</span></th><th>Total · <span class="my">စုစုပေါင်း</span></th></tr>'+
+     [['hps','☀️ HPS 1000W','မီးကြီး'],['mh','🔥 MH heat light','အပူပေးမီး'],['lights','💡 Room lights','အခန်းမီး']].map(function(x){
+       var k=x[0], ps=R[k].periods;
+       return '<tr><td>'+x[1]+'<div class="my">'+x[2]+'</div></td><td>'+
+         ps.map(function(p,i){
+           return '<div class="per"><span class="pn">#'+(i+1)+'</span>'+tbox('per',k+'.'+i+'.on',p.on)+'<span class="dash">→</span>'+tbox('per',k+'.'+i+'.off',p.off)+
+             (ps.length>1?'<button class="x" style="width:28px;height:28px;font-size:12px" title="Remove period" onclick="delPeriod(\''+k+'\','+i+')">✕</button>':'')+'</div>';
+         }).join('')+
+         '<button class="btn sm" onclick="addPeriod(\''+k+'\')">＋ Add period · <span class="my">ထပ်ထည့်</span></button>'+chgS(k)+
+       '</td><td>'+hChip('h-'+k,R[k])+'</td></tr>';
+     }).join('')+'</table></div>'+
+
+     '<div class="sec">☀️ HPS 1000W bulbs (40) · <span class="my">မီးသီး ၄၀</span> <span class="chip '+(working<40?'r':'g')+'">'+working+' / 40 working · ကောင်း</span></div>'+
+     '<div style="font-size:12px;color:var(--muted);margin-bottom:6px">Tap a bulb to mark it broken (red). Tap again when fixed. · ပျက်သောမီးသီးကို နှိပ်ပါ</div>'+
+     '<div class="bulbs">';
+  for(var b=1;b<=40;b++) h+='<div class="bulb'+(R.hps.broken.indexOf(b)>=0?' bad':'')+'" onclick="toggleBulb('+b+')">'+b+'</div>';
+  h+='</div>'+
+     '<div class="sec">🔥 MH heating lights — bulbs per cage (0–4) · <span class="my">လှောင်အိမ်တစ်ခုစီ အပူပေးမီးသီး</span> <span class="chip b">'+mhInst+' bulbs</span>'+(mhNone?' <span class="chip">'+mhNone+' cages with no bulb · မီးသီးမရှိ</span>':'')+' <span class="chip '+(mhBad?'r':'g')+'">'+mhBad+' broken · ပျက်</span></div>'+
+     '<div class="mh-grid">';
+  for(var c2=1;c2<=n;c2++){
+    var m=R.mh.cages[c2-1]||['',''], set=(m[0]!==''&&m[0]!=null), bn=num(m[0]);
+    var bo=''; for(var k=0;k<=Math.max(bn,0);k++) bo+='<option value="'+k+'"'+(num(m[1])===k?' selected':'')+'>'+k+' broken</option>';
+    h+='<div class="mh'+(num(m[1])?' bad':'')+(set&&bn===0?' none':'')+'"><b>C'+c2+'</b>'+
+      '<select onchange="setMH('+c2+',0,this.value)"><option value="">bulbs?</option>'+[0,1,2,3,4].map(function(q){ return '<option value="'+q+'"'+(set&&bn===q?' selected':'')+'>'+(q===0?'0 — none':q+' bulb'+(q>1?'s':''))+'</option>'; }).join('')+'</select>'+
+      '<select onchange="setMH('+c2+',1,this.value)"'+(bn?'':' disabled')+'>'+bo+'</select></div>';
+  }
+  h+='</div>'+
+     '<div class="sec">💡 Room lighting — aisles · <span class="my">လမ်းကြားမီး</span></div><div class="g3">'+
+     [['L','Left aisle','ဘယ်လမ်း'],['M','Middle aisle','အလယ်လမ်း'],['R','Right aisle','ညာလမ်း']].map(function(a){
+       return '<div><span class="lbl">'+a[1]+' · <span class="my">'+a[2]+'</span></span>'+rseg('aisles.'+a[0],PW3)+'</div>';
+     }).join('')+'</div>'+
+     '<div class="fld" style="margin-top:10px"><span class="lbl">Lighting notes — which is broken, on or off · <span class="my">မီး မှတ်ချက်</span></span>'+
+     '<textarea class="in" rows="2" oninput="setRD(\'lightNotes\',this.value)">'+esc(R.lightNotes||'')+'</textarea></div>'+
+     '</div></div>';
+
+  // FANS + EXHAUST
+  h+='<div class="card"><div class="card-h"><span class="card-t">🌀 Circulating fans (2) &amp; exhaust · <span class="my">လေလည်ပန်ကာ (၂) နှင့် လေထုတ်ပိုက်</span></span></div><div class="card-b"><div class="units">';
+  [0,1].forEach(function(i){
+    var u=R.fans[i]||{}, p='fans.'+i;
+    h+='<div class="unit"><div class="unit-h">🌀 Fan #'+(i+1)+' · <span class="my">ပန်ကာ '+(i+1)+'</span> '+hChip('h-fan'+i,u)+'</div>'+
+      '<div class="fld">'+rseg(p+'.pw',PW3)+'</div>'+
+      '<div class="g2 fld"><div><span class="lbl">ON at · <span class="my">ဖွင့်ချိန်</span></span>'+timeIn(p+'.on')+'</div><div><span class="lbl">OFF at · <span class="my">ပိတ်ချိန်</span></span>'+timeIn(p+'.off')+'</div></div>'+
+      '<input class="in" placeholder="Notes · မှတ်ချက်" value="'+esc(u.n||'')+'" oninput="setRD(\''+p+'.n\',this.value)"></div>';
+  });
+  var ex=R.exhaust||{};
+  h+='<div class="unit"><div class="unit-h">🌬️ Exhaust pipe · <span class="my">လေထုတ်ပိုက်</span> '+hChip('h-ex',ex)+'</div>'+
+    '<div class="fld">'+rseg('exhaust.pw',PW3)+'</div>'+
+    '<div class="g2 fld"><div><span class="lbl">Turned ON at · <span class="my">ဖွင့်ချိန်</span></span>'+timeIn('exhaust.on')+'</div><div><span class="lbl">Turned OFF at · <span class="my">ပိတ်ချိန်</span></span>'+timeIn('exhaust.off')+'</div></div>'+
+    '<input class="in" placeholder="Notes · မှတ်ချက်" value="'+esc(ex.n||'')+'" oninput="setRD(\'exhaust.n\',this.value)"></div>';
+  h+='</div></div></div>';
+
+  // change log for the day
+  if(R.changes && R.changes.length)
+    h+='<div class="card"><div class="card-h"><span class="card-t">⏱️ Changes logged today · <span class="my">ယနေ့ ပြောင်းလဲမှုများ</span></span></div><div class="card-b changes">'+
+       R.changes.map(function(c){ return '<div>'+esc(c)+'</div>'; }).join('')+'</div></div>';
+
+  page.innerHTML=h;
+  window.scrollTo(0,keepY);
+  updRoomDerived();
+}
+function updRoomDerived(){
+  if(!RD) return;
+  [['h-hps',RD.hps],['h-mh',RD.mh],['h-lights',RD.lights],['h-fan0',RD.fans[0]],['h-fan1',RD.fans[1]],['h-ex',RD.exhaust]].forEach(function(x){
+    var el=document.getElementById(x[0]); if(!el||!x[1]) return; var hh=schedHrs(x[1]);
+    el.textContent=fmtH(hh); el.className='chip '+(hh==null?'':'b');
+  });
+  var note=document.getElementById('room-save-note');
+  if(note) note.textContent = rdDirty ? '⚠️ Not saved yet · မသိမ်းရသေး' : (DB.roomday[curRoom+'|'+curDate] ? '✅ Saved · သိမ်းပြီး' : '');
+}
+function draftR(slot,k,v){ readingDraft[slot]=readingDraft[slot]||{}; readingDraft[slot][k]=v; }
+function saveReadings(){
+  if(!emp()){ showToast('Enter your name at the top first · နာမည်ထည့်ပါ','err'); return; }
+  var n=0;
+  Object.keys(readingDraft).forEach(function(slot){
+    var d=readingDraft[slot], k=curRoom+'|'+curDate+'|'+slot, sv=DB.reading[k]||{};
+    var temp=d.temp!=null?d.temp:sv.temp, hum=d.hum!=null?d.hum:sv.hum;
+    if((temp===''||temp==null) && (hum===''||hum==null)) return;
+    saveRecord('reading', {room:curRoom, date:curDate, slot:slot, temp:temp===''?'':num(temp), hum:hum===''?'':num(hum)});
+    n++;
+  });
+  readingDraft={};
+  if(!n){ showToast('Type a temperature or humidity first · အပူချိန် ထည့်ပါ','err'); return; }
+  showToast('✅ '+n+' reading'+(n>1?'s':'')+' saved · သိမ်းပြီး','ok');
+  renderRoom();
+}
+// What's compared for the change log (every timer change is noted)
+var TRACK = [
+  ['hvac.0.t','HVAC#1 set temp'],['hvac.0.h','HVAC#1 set humidity'],['hvac.0.pw','HVAC#1 power'],
+  ['hvac.1.t','HVAC#2 set temp'],['hvac.1.h','HVAC#2 set humidity'],['hvac.1.pw','HVAC#2 power'],
+  ['hvac.2.t','HVAC#3 set temp'],['hvac.2.h','HVAC#3 set humidity'],['hvac.2.pw','HVAC#3 power'],
+  ['fans.0.pw','Fan#1'],['fans.1.pw','Fan#2'],['exhaust.pw','Exhaust'],
+  ['aisles.L','Left aisle'],['aisles.M','Middle aisle'],['aisles.R','Right aisle']
+];
+function saveRoomDay(){
+  if(!emp()){ showToast('Enter your name at the top first · နာမည်ထည့်ပါ','err'); return; }
+  if(Object.keys(readingDraft).length) saveReadings();
+  var base = DB.roomday[curRoom+'|'+curDate] || prevRoomDay(curRoom,curDate);
+  var o=clone(RD); delete o._from;
+  ['hps','mh','lights'].forEach(function(k){ o[k].periods=o[k].periods.filter(function(p){ return p.on||p.off; }); });
+  o.changes = (DB.roomday[curRoom+'|'+curDate] && DB.roomday[curRoom+'|'+curDate].changes) ? DB.roomday[curRoom+'|'+curDate].changes.slice() : [];
+  if(base){
+    TRACK.forEach(function(t){
+      var a=String(getPath(base,t[0])==null?'':getPath(base,t[0])), b=String(getPath(o,t[0])==null?'':getPath(o,t[0]));
+      if(a!==b) o.changes.push(nowHM()+' — '+t[1]+': '+(a||'—')+' → '+(b||'—')+(emp()?' ('+emp()+')':''));
+    });
+    [['hps','HPS timer'],['mh','MH timer'],['lights','Room lights timer']].forEach(function(t){
+      var a=schedStr(base[t[0]]), b=schedStr(o[t[0]]);
+      if(a!==b) o.changes.push(nowHM()+' — '+t[1]+': '+(a||'—')+' → '+(b||'—')+(emp()?' ('+emp()+')':''));
+    });
+    var ba=(getPath(base,'hps.broken')||[]).join(','), bb=o.hps.broken.join(',');
+    if(ba!==bb) o.changes.push(nowHM()+' — HPS broken bulbs: '+(ba||'none')+' → '+(bb||'none')+(emp()?' ('+emp()+')':''));
+  }
+  saveRecord('roomday', o);
+  loadRoomDay();
+  showToast('✅ INFR#'+curRoom+' room check saved · သိမ်းပြီး','ok');
+  renderRoom();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SYNC — every save goes to this device first, then to the Sheet.
+// Anything not confirmed by the Sheet is retried automatically.
+// ══════════════════════════════════════════════════════════════════
+function saveRecord(kind, o){
+  o.emp = emp(); o.updatedAt = Date.now();
+  var key=keyOf(kind,o);
+  DB[kind][key]=o; PENDING[kind+'|'+key]=true;
+  if(kind==='cage'){ var lk=o.room+'|'+o.cage; if(!LATEST[lk] || LATEST[lk].date<=o.date) LATEST[lk]=o; }
+  persist(); STATS_CACHE=null; pushPending();
+  if(curTab==='groups') renderGroups();
+}
+function setPill(txt,cls){ var p=document.getElementById('pill'); p.textContent='⬤ '+txt; p.className='pill '+(cls||''); }
+function pillState(){
+  var n=Object.keys(PENDING).length;
+  if(!SHEET_URL) setPill('Not connected · '+n+' on device','warn');
+  else if(scriptOutdated) setPill('Sheet script old','err');
+  else if(n) setPill(n+' not sent · မပို့ရသေး','warn');
+  else setPill('Live ✓ '+nowHM(),'ok');
+}
+function api(body){
+  var q=JSON.stringify(body);
+  var url=SHEET_URL+'?payload='+encodeURIComponent(q)+'&t='+Date.now();
+  var p = url.length<7000
+    ? fetch(url,{method:'GET'})
+    : fetch(SHEET_URL,{method:'POST',body:q});   // text/plain → no CORS pre-flight
+  return p.then(function(r){ return r.text(); }).then(function(t){
+    var j; try{ j=JSON.parse(t); }catch(e){ throw new Error('Sheet did not reply'); }
+    if(!j.version || String(j.version)<NEED_SCRIPT_VERSION){ scriptOutdated=true; throw new Error('Sheet script is out of date'); }
+    scriptOutdated=false;
+    if(!j.ok) throw new Error(j.error||'Sheet error');
+    return j;
+  });
+}
+function pushPending(){
+  if(!SHEET_URL||pushing){ pillState(); return; }
+  var keys=Object.keys(PENDING); if(!keys.length){ pillState(); return; }
+  pushing=true; setPill('Saving… · သိမ်းနေ','warn');
+  var pk=keys[0], i=pk.indexOf('|'), kind=pk.slice(0,i), key=pk.slice(i+1), obj=DB[kind][key];
+  if(!obj){ delete PENDING[pk]; pushing=false; persist(); return pushPending(); }
+  var sentAt=obj.updatedAt;
+  api({action:'save', kind:kind, obj:obj}).then(function(){
+    if(DB[kind][key] && DB[kind][key].updatedAt===sentAt) delete PENDING[pk];
+    persist(); pushing=false; pushPending();
+  }).catch(function(err){
+    pushing=false; pillState(); console.warn('push failed', err);
+    if(scriptOutdated) showSetupWarn('⚠️ The Google Sheet script is out of date. Apps Script → Deploy → Manage deployments → ✎ Edit → New version → Deploy. Saves are kept on this device until then. · Sheet script ဟောင်းနေသည်');
+  });
+}
+function mergeList(res){
+  var changed=0;
+  ['cage','reading','roomday'].forEach(function(kind){
+    (res[kind]||[]).forEach(function(o){
+      var key=keyOf(kind,o);
+      if(PENDING[kind+'|'+key]) return;
+      var l=DB[kind][key];
+      if(!l || num(o.updatedAt)>=num(l.updatedAt)){ if(!l || num(o.updatedAt)!==num(l.updatedAt)) changed++; DB[kind][key]=o; }
+      if(kind==='cage'){ var lk=o.room+'|'+o.cage; if(!LATEST[lk] || LATEST[lk].date<=o.date) LATEST[lk]=o; }
+    });
+  });
+  (res.latest||[]).forEach(function(o){ var lk=o.room+'|'+o.cage; if(!LATEST[lk] || LATEST[lk].date<=o.date) LATEST[lk]=o; });
+  if(res.now) SERVER_TS=res.now;
+  if(res.lastMod) LAST_MOD=res.lastMod;
+  return changed;
+}
+function pull(){
+  if(!SHEET_URL){ pillState(); return Promise.resolve(); }
+  var first=!SERVER_TS;
+  var req = first ? {action:'list', days:21, latest:1} : null;
+  var p = first ? api(req) : api({action:'ping'}).then(function(j){
+    if(j.lastMod===LAST_MOD) return null;
+    return api({action:'list', since:SERVER_TS-60000});
+  });
+  return p.then(function(res){
+    if(!res){ pillState(); return; }
+    var ch=mergeList(res); persist();
+    if(ch){ STATS_CACHE=null; refreshAfterPull(); if(!first) showToast('🔄 '+ch+' update'+(ch>1?'s':'')+' from other devices · ဒေတာအသစ်'); }
+    pillState(); pushPending();
+  }).catch(function(e){ console.warn('pull failed',e); if(scriptOutdated) pillState(); else setPill('Offline · အင်တာနက်မရှိ','err'); });
+}
+function refreshAfterPull(){
+  if(curTab==='groups') renderGroups();
+  if(curTab==='cages' && !editing) renderCages();
+  if(curTab==='room' && !rdDirty){ loadRoomDay(); renderRoom(); }
+  if(curTab==='history') renderHistory();
+}
+function syncNow(){ if(!SHEET_URL){ showSetupWarn(); return; } pull(); pushPending(); }
+function showSetupWarn(msg){
+  var el=document.getElementById('setup-warn');
+  el.innerHTML = msg || '⚠️ Not connected to Google Sheets yet — everything is kept on this device. Paste the Apps Script /exec link into <b>SHEET_URL</b> in index.html. · Google Sheet မချိတ်ရသေးပါ';
+  el.style.display='block';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SUMMARY & STATS — compares the 4 rooms
+// ══════════════════════════════════════════════════════════════════
+var RANGES=[{k:'1',l:'Today',my:'ယနေ့'},{k:'7',l:'7 days',my:'၇ ရက်'},{k:'14',l:'14 days',my:'၁၄ ရက်'},{k:'30',l:'30 days',my:'၃၀ ရက်'}];
+function renderRangeBtns(){
+  document.getElementById('stats-range').innerHTML=RANGES.map(function(r){
+    return '<button class="'+(statsRange===r.k?'on ok':'')+'" onclick="setRange(\''+r.k+'\')">'+r.l+'<span class="my">'+r.my+'</span></button>';
+  }).join('');
+}
+function setRange(k){
+  statsRange=k; var to=todayStr();
+  document.getElementById('st-to').value=to;
+  document.getElementById('st-from').value=addDays(to,-(+k-1));
+  STATS_CACHE=null; loadStats(true);
+}
+function localRange(from,to){
+  var o={cage:[],reading:[],roomday:[]};
+  ['cage','reading','roomday'].forEach(function(k){ Object.keys(DB[k]).forEach(function(key){ var r=DB[k][key]; if(r.date>=from && r.date<=to) o[k].push(r); }); });
+  return o;
+}
+function loadStats(fetchRemote){
+  renderRangeBtns();
+  var from=document.getElementById('st-from').value, to=document.getElementById('st-to').value;
+  if(!from||!to){ setRange(statsRange); return; }
+  var local=localRange(from,to);
+  var data = (STATS_CACHE && STATS_CACHE.from===from && STATS_CACHE.to===to) ? STATS_CACHE.data : local;
+  renderStats(from,to,data);
+  var note=document.getElementById('stats-note');
+  if(fetchRemote && SHEET_URL && from < addDays(todayStr(),-20)){
+    note.textContent='Loading from Sheet… · ဆွဲယူနေ'; note.className='chip a';
+    api({action:'list', from:from, to:to, latest:1}).then(function(res){
+      mergeList({latest:res.latest});
+      var d={cage:res.cage||[], reading:res.reading||[], roomday:res.roomday||[]};
+      // add local records not yet in the Sheet
+      ['cage','reading','roomday'].forEach(function(k){
+        var seen={}; d[k].forEach(function(r){ seen[keyOf(k,r)]=1; });
+        local[k].forEach(function(r){ if(!seen[keyOf(k,r)]) d[k].push(r); });
+      });
+      STATS_CACHE={from:from,to:to,data:d};
+      note.textContent='From Sheet ✓ · Sheet မှ'; note.className='chip g';
+      renderStats(from,to,d);
+    }).catch(function(){ note.textContent='Showing this device\'s data · ဤစက်ရှိ ဒေတာ'; note.className='chip a'; });
+  } else { note.textContent=from+' → '+to; note.className='chip b'; }
+}
+function computeStats(from,to,data){
+  var days=[]; for(var d=from; d<=to && days.length<400; d=addDays(d,1)) days.push(d);
+  var today=todayStr();
+  var countDays=days.filter(function(d){ return d<=today; }).length||1;
+  return ROOMS.map(function(R){
+    var n=R.cages, s={room:R.n, cages:n};
+    var cg=data.cage.filter(function(o){ return o.room==R.n; });
+    var uniq={}; cg.forEach(function(o){ uniq[o.cage]=1; });
+    s.checks=cg.length; s.uniqueCages=Object.keys(uniq).length;
+    var mm=cg.map(function(o){ return mins(o.start,o.end); }).filter(function(x){ return x!=null && x<600; });
+    s.avgMin=avg(mm); s.totalMin=mm.reduce(function(a,b){return a+b;},0);
+    s.find={}; FIND.forEach(function(f){ s.find[f.k]=0; });
+    cg.forEach(function(o){ (o.found||[]).forEach(function(f){ s.find[f.t]=(s.find[f.t]||0)+1; }); });
+    s.findTotal=FIND.reduce(function(a,f){ return a+s.find[f.k]; },0);
+    var gsum=groupSummary(R.n, from, to, data.cage); s.laid=gsum.tot.laid; s.ln=gsum.tot.n;
+    s.dayLaid=days.map(function(d){ var t=0; cg.forEach(function(o){ if(o.date===d) t+=(o.laid||[]).length; }); return t; });
+    s.F=0; s.M=0; s.pairs=0; s.clutches=0; s.poor=0; s.fair=0;
+    for(var c=1;c<=n;c++){
+      var best=null;
+      cg.forEach(function(o){ if(o.cage==c && (!best||o.date>best.date)) best=o; });
+      var L=LATEST[R.n+'|'+c]; if(L && L.date<=to && (!best||L.date>best.date)) best=L;
+      if(!best) continue;
+      s.F+=num(best.females); s.M+=num(best.males); s.clutches+=num(best.clutches);
+      if(best.paired && !best.apart) s.pairs++;
+      if(best.cond==='Poor') s.poor++; if(best.cond==='Fair') s.fair++;
+    }
+    var rd=data.reading.filter(function(o){ return o.room==R.n; });
+    var temps=rd.map(function(o){ return o.temp; }).filter(function(x){ return x!==''&&x!=null; }).map(Number);
+    var hums=rd.map(function(o){ return o.hum; }).filter(function(x){ return x!==''&&x!=null; }).map(Number);
+    s.tAvg=avg(temps); s.tMin=temps.length?Math.min.apply(null,temps):null; s.tMax=temps.length?Math.max.apply(null,temps):null;
+    s.hAvg=avg(hums); s.hMin=hums.length?Math.min.apply(null,hums):null; s.hMax=hums.length?Math.max.apply(null,hums):null;
+    s.readings=rd.length; s.readingsExp=countDays*SLOTS.length;
+    s.dayTemp=days.map(function(d){ return avg(rd.filter(function(o){ return o.date===d && o.temp!==''&&o.temp!=null; }).map(function(o){ return +o.temp; })); });
+    s.dayHum=days.map(function(d){ return avg(rd.filter(function(o){ return o.date===d && o.hum!==''&&o.hum!=null; }).map(function(o){ return +o.hum; })); });
+    var ad=data.roomday.filter(function(o){ return o.room==R.n; }).sort(function(a,b){ return a.date<b.date?-1:1; });
+    var hv=function(f){ return avg(ad.map(f).filter(function(x){ return x!=null; })); };
+    s.hpsH=hv(function(o){ return schedHrs(o.hps); });
+    s.mhH=hv(function(o){ return schedHrs(o.mh); });
+    s.lightH=hv(function(o){ return schedHrs(o.lights); });
+    s.fanH=hv(function(o){ var a=(o.fans||[]).map(function(f){ return hrs(f.on,f.off); }).filter(function(x){ return x!=null; }); return a.length?avg(a):null; });
+    s.exH=hv(function(o){ return o.exhaust?hrs(o.exhaust.on,o.exhaust.off):null; });
+    s.apDays=ad.length;
+    s.hvacProblems=0; ad.forEach(function(o){ (o.hvac||[]).forEach(function(u){ if(u.st==='problem') s.hvacProblems++; }); });
+    s.changes=ad.reduce(function(a,o){ return a+((o.changes||[]).length); },0);
+    var last=ad[ad.length-1] || prevRoomDay(R.n, addDays(to,1));
+    s.lastAp=last?last.date:null;
+    if(last){
+      s.hvacOn=(last.hvac||[]).filter(function(u){ return u.pw==='on'; }).length;
+      s.hpsWorking=40-((last.hps&&last.hps.broken)||[]).length;
+      s.mhInst=0; s.mhBad=0; ((last.mh&&last.mh.cages)||[]).forEach(function(c){ if(c){ s.mhInst+=num(c[0]); s.mhBad+=num(c[1]); } });
+      var cl=(last.hvac||[]).map(function(u){ return u.clean; }).filter(Boolean).sort();
+      s.oldestClean=cl.length?Math.round((parseYmd(to>today?today:to)-parseYmd(cl[0]))/86400000):null;
+      s.fansOn=(last.fans||[]).filter(function(f){ return f.pw==='on'; }).length;
+    }
+    return s;
+  });
+}
+function renderStats(from,to,data){
+  var S=computeStats(from,to,data);
+  var days=[]; for(var d=from; d<=to && days.length<400; d=addDays(d,1)) days.push(d);
+  var row=function(label,my,fn,mode){
+    var vals=S.map(fn), nums=vals.map(function(v){ return typeof v==='number'?v:null; }).filter(function(v){ return v!=null; });
+    var hi=nums.length?Math.max.apply(null,nums):null, lo=nums.length?Math.min.apply(null,nums):null;
+    return '<tr><td>'+label+'<div class="my">'+my+'</div></td>'+vals.map(function(v){
+      var cls=''; if(mode==='bad' && typeof v==='number' && v>0 && v===hi) cls='hi'; if(mode==='good' && typeof v==='number' && nums.length>1 && v===hi && hi!==lo) cls='best';
+      return '<td class="'+cls+'">'+(v==null||v===''?'—':(typeof v==='number'?r1(v):v))+'</td>';
+    }).join('')+'</tr>';
+  };
+  var grp=function(t){ return '<tr class="grp"><td colspan="5">'+t+'</td></tr>'; };
+  var pct=function(a,b){ return b?Math.round(a/b*100)+'%':'—'; };
+  var h='<div class="card"><div class="card-h"><span class="card-t">📋 Group summary — eggs laid by female group · <span class="my">အုပ်စုအလိုက် ဥချမှု အနှစ်ချုပ်</span></span><span class="chip">'+esc(from)+' → '+esc(to)+'</span></div>'+
+    '<div class="card-b" style="font-size:12px;color:var(--muted)">♀ laid = females that laid in these dates (same female ID counted once). 1st / 2nd / 3rd / 4th+ = how many times each had laid. % of ♀ laid = ♀ laid ÷ females in the group now. · ဥချသော အမ ÷ အုပ်စုရှိ အမ</div></div>';
+  ROOMS.forEach(function(R){
+    var gs=groupSummary(R.n, from, to, data.cage);
+    h+='<div class="card"><div class="card-h"><span class="card-t">INFR#'+R.n+' · <span class="my">'+R.cages+' cages</span></span>'+
+       '<span class="chip g">🥚 '+gs.tot.laid+' females laid</span><span class="chip">1st '+gs.tot.n[1]+' · 2nd '+gs.tot.n[2]+' · 3rd '+gs.tot.n[3]+' · 4th+ '+gs.tot.n[4]+'</span></div>'+
+       '<div class="card-b" style="padding:0">'+groupTable(gs,false)+'</div></div>';
+  });
+  h+='<div class="card"><div class="card-h"><span class="card-t">🏠 Compare rooms · <span class="my">အခန်းများ နှိုင်းယှဉ်</span></span><span class="chip">'+esc(from)+' → '+esc(to)+'</span>'+
+    '<span class="chip r">red = most problems</span><span class="chip g">green = best</span></div><div class="tbl-wrap"><table class="t"><thead><tr><th></th>'+
+    S.map(function(s){ return '<th>INFR#'+s.room+'<br><span class="my">'+s.cages+' cages</span></th>'; }).join('')+'</tr></thead><tbody>';
+  h+=grp('🦎 Breeding groups · မွေးမြူရေးအုပ်စု');
+  h+=row('♀ Females','အမ',function(s){ return s.F; });
+  h+=row('♂ Males','အထီး',function(s){ return s.M; });
+  h+=row('Active pairs (paired, not apart)','တွဲထားဆဲ',function(s){ return s.pairs; });
+  h+=row('🥚 Females laid (these dates)','ဥချသော အမ',function(s){ return s.laid; },'good');
+  h+=row('↳ 1st / 2nd / 3rd / 4th+ time','ပထမ / ဒုတိယ / တတိယ / စတုတ္ထ+',function(s){ return s.ln[1]+' / '+s.ln[2]+' / '+s.ln[3]+' / '+s.ln[4]; });
+  h+=row('% of females laid','ဥချသော အမ %',function(s){ return s.F?Math.round(s.laid/s.F*100):null; },'good');
+  h+=row('🥚 Clutches collected (current pairs)','ဥအုပ် ရရှိမှု',function(s){ return s.clutches; },'good');
+  h+=row('Clutches per active pair','တစ်တွဲလျှင် ဥအုပ်',function(s){ return s.pairs?s.clutches/s.pairs:null; },'good');
+  h+=row('Cage checks done','စစ်ဆေးမှု အကြိမ်',function(s){ return s.checks; },'good');
+  h+=row('Different cages checked','စစ်ပြီးသော လှောင်အိမ်',function(s){ return s.uniqueCages+' / '+s.cages+' ('+pct(s.uniqueCages,s.cages)+')'; });
+  h+=row('Avg minutes per cage check','တစ်ခုလျှင် မိနစ်',function(s){ return s.avgMin; });
+  h+=row('Cages in Poor / Fair condition','အခြေအနေ ညံ့/သင့်တင့်',function(s){ return s.poor+' / '+s.fair; });
+  h+=grp('🔍 Animals found · တွေ့ရှိမှု');
+  FIND.forEach(function(f){ h+=row(f.k+' — '+f.en, f.my, function(s){ return s.find[f.k]; },'bad'); });
+  h+=row('<b>Total found</b>','စုစုပေါင်း',function(s){ return s.findTotal; },'bad');
+  h+=row('Found per 100 cage checks','စစ်ဆေးမှု ၁၀၀ လျှင်',function(s){ return s.checks?s.findTotal/s.checks*100:null; },'bad');
+  h+=grp('🌡️ Temperature & humidity · အပူချိန်နှင့် စိုထိုင်းဆ');
+  h+=row('Avg temp °C','ပျမ်းမျှ အပူချိန်',function(s){ return s.tAvg; });
+  h+=row('Min – max temp °C','အနိမ့် – အမြင့်',function(s){ return s.tMin==null?null:r1(s.tMin)+' – '+r1(s.tMax); });
+  h+=row('Avg humidity %','ပျမ်းမျှ စိုထိုင်းဆ',function(s){ return s.hAvg; });
+  h+=row('Min – max humidity %','အနိမ့် – အမြင့်',function(s){ return s.hMin==null?null:r1(s.hMin)+' – '+r1(s.hMax); });
+  h+=row('Hourly checks done','စစ်ဆေးမှု ပြီး',function(s){ return s.readings+' / '+s.readingsExp+' ('+pct(s.readings,s.readingsExp)+')'; });
+  h+=grp('💡 Lighting & airflow (avg hours / day) · မီးနှင့် လေ (တစ်ရက် ပျမ်းမျှ နာရီ)');
+  h+=row('☀️ HPS hours','HPS နာရီ',function(s){ return s.hpsH; });
+  h+=row('🔥 MH heat light hours','အပူပေးမီး နာရီ',function(s){ return s.mhH; });
+  h+=row('💡 Room light hours','အခန်းမီး နာရီ',function(s){ return s.lightH; });
+  h+=row('🌀 Circulating fan hours (per fan)','ပန်ကာ နာရီ',function(s){ return s.fanH; });
+  h+=row('🌬️ Exhaust hours','လေထုတ်ပိုက် နာရီ',function(s){ return s.exH; });
+  h+=row('Timer / setting changes','ပြောင်းလဲမှု',function(s){ return s.changes; });
+  h+=grp('⚙️ Appliances (latest check) · စက်ပစ္စည်းများ (နောက်ဆုံး)');
+  h+=row('Last appliance check','နောက်ဆုံး စစ်ဆေးသည့်ရက်',function(s){ return s.lastAp; });
+  h+=row('HVAC units ON','ဖွင့်ထားသော HVAC',function(s){ return s.hvacOn==null?null:s.hvacOn+' / 3'; });
+  h+=row('HVAC problem reports','HVAC ပြဿနာ',function(s){ return s.hvacProblems; },'bad');
+  h+=row('Days since oldest HVAC cleaning','သန့်ရှင်းပြီး ရက်',function(s){ return s.oldestClean; },'bad');
+  h+=row('HPS bulbs working','HPS ကောင်း',function(s){ return s.hpsWorking==null?null:s.hpsWorking+' / 40'; });
+  h+=row('MH bulbs broken','MH ပျက်',function(s){ return s.mhBad==null?null:s.mhBad+' of '+s.mhInst; });
+  h+=row('Circulating fans ON','ပန်ကာ ဖွင့်',function(s){ return s.fansOn==null?null:s.fansOn+' / 2'; });
+  h+='</tbody></table></div></div>';
+
+  h+='<div class="charts">'+
+    '<div class="card"><div class="card-h"><span class="card-t">Avg temperature °C per day · <span class="my">နေ့စဉ် အပူချိန်</span></span></div><div class="card-b"><div class="chart-box"><canvas id="c-temp"></canvas></div></div></div>'+
+    '<div class="card"><div class="card-h"><span class="card-t">Avg humidity % per day · <span class="my">နေ့စဉ် စိုထိုင်းဆ</span></span></div><div class="card-b"><div class="chart-box"><canvas id="c-hum"></canvas></div></div></div>'+
+    '<div class="card"><div class="card-h"><span class="card-t">Animals found by type · <span class="my">တွေ့ရှိမှု အမျိုးအစား</span></span></div><div class="card-b"><div class="chart-box"><canvas id="c-find"></canvas></div></div></div>'+
+    '<div class="card"><div class="card-h"><span class="card-t">Lighting hours / day · <span class="my">မီး နာရီ</span></span></div><div class="card-b"><div class="chart-box"><canvas id="c-light"></canvas></div></div></div>'+
+    '<div class="card"><div class="card-h"><span class="card-t">🥚 Females laid per day · <span class="my">နေ့စဉ် ဥချသော အမ</span></span></div><div class="card-b"><div class="chart-box"><canvas id="c-laid"></canvas></div></div></div>'+
+    '<div class="card"><div class="card-h"><span class="card-t">Clutches &amp; active pairs · <span class="my">ဥအုပ်နှင့် တွဲများ</span></span></div><div class="card-b"><div class="chart-box"><canvas id="c-clutch"></canvas></div></div></div>'+
+  '</div>';
+  document.getElementById('stats-body').innerHTML=h;
+  drawCharts(S,days);
+}
+var ROOM_COLORS=['#1877f2','#42b72a','#f7b928','#e02424'];
+function drawCharts(S,days){
+  if(typeof Chart==='undefined') return;
+  Object.keys(charts).forEach(function(k){ charts[k].destroy(); }); charts={};
+  var labels=days.map(function(d){ return d.slice(5); });
+  var lbl=S.map(function(s){ return 'INFR#'+s.room; });
+  var base={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:11}}}},scales:{x:{ticks:{maxTicksLimit:10}}}};
+  var line=function(id,key){
+    charts[id]=new Chart(document.getElementById(id),{type:'line',data:{labels:labels,datasets:S.map(function(s,i){
+      return {label:'INFR#'+s.room,data:s[key].map(function(v){ return v==null?null:Math.round(v*10)/10; }),borderColor:ROOM_COLORS[i],backgroundColor:ROOM_COLORS[i],tension:.3,spanGaps:true,pointRadius:3};
+    })},options:base});
+  };
+  line('c-temp','dayTemp'); line('c-hum','dayHum');
+  charts.laid=new Chart(document.getElementById('c-laid'),{type:'bar',data:{labels:labels,datasets:S.map(function(s,i){
+    return {label:'INFR#'+s.room,data:s.dayLaid,backgroundColor:ROOM_COLORS[i]};
+  })},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true,ticks:{precision:0}}}}});
+  charts.find=new Chart(document.getElementById('c-find'),{type:'bar',data:{labels:lbl,datasets:FIND.map(function(f){
+    return {label:f.k,data:S.map(function(s){ return s.find[f.k]; }),backgroundColor:f.c};
+  })},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true,ticks:{precision:0}}}}});
+  charts.light=new Chart(document.getElementById('c-light'),{type:'bar',data:{labels:lbl,datasets:[
+    {label:'HPS',data:S.map(function(s){ return s.hpsH; }),backgroundColor:'#f7b928'},
+    {label:'MH',data:S.map(function(s){ return s.mhH; }),backgroundColor:'#e8590c'},
+    {label:'Room lights',data:S.map(function(s){ return s.lightH; }),backgroundColor:'#1877f2'},
+    {label:'Fans',data:S.map(function(s){ return s.fanH; }),backgroundColor:'#0891b2'},
+    {label:'Exhaust',data:S.map(function(s){ return s.exH; }),backgroundColor:'#6b7280'}
+  ]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,max:24}}}});
+  charts.clutch=new Chart(document.getElementById('c-clutch'),{type:'bar',data:{labels:lbl,datasets:[
+    {label:'Clutches',data:S.map(function(s){ return s.clutches; }),backgroundColor:'#42b72a'},
+    {label:'Active pairs',data:S.map(function(s){ return s.pairs; }),backgroundColor:'#7c3aed'}
+  ]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});
+}
+
+// ══════════════════════════════════════════════════════════════════
+// HISTORY + CSV
+// ══════════════════════════════════════════════════════════════════
+function histData(){
+  var type=document.getElementById('h-type').value, room=document.getElementById('h-room').value;
+  var from=document.getElementById('h-from').value||'0000', to=document.getElementById('h-to').value||'9999';
+  var kind=type==='changes'?'roomday':type;
+  var map={}; Object.keys(DB[kind]).forEach(function(k){ map[k]=DB[kind][k]; });
+  if(HIST_EXTRA && HIST_EXTRA[kind]) HIST_EXTRA[kind].forEach(function(o){ var k=keyOf(kind,o); if(!map[k]) map[k]=o; });
+  return Object.keys(map).map(function(k){ return map[k]; })
+    .filter(function(o){ return (room==='all'||o.room==room) && o.date>=from && o.date<=to; })
+    .sort(function(a,b){ return a.date===b.date ? (a.room-b.room || num(a.cage)-num(b.cage) || String(a.slot||'').localeCompare(String(b.slot||''))) : (a.date<b.date?1:-1); });
+}
+function histTable(){
+  var type=document.getElementById('h-type').value, rows=histData(), head=[], body=[];
+  if(type==='cage'){
+    head=['Date','Room','Cage','By','Start','End','Min','♀','♂','♀ Morph','♂ Morph','♀ Grp','♂ Grp','Paired','Apart','Clutches','Condition','🥚 Laid'].concat(FIND.map(function(f){return f.k;})).concat(['Found detail','Notes']);
+    body=rows.map(function(o){
+      var cnt={}; (o.found||[]).forEach(function(f){ cnt[f.t]=(cnt[f.t]||0)+1; });
+      return [o.date,'INFR#'+o.room,o.cage,o.emp,o.start,o.end,mins(o.start,o.end),o.females,o.males,o.fMorph,o.mMorph,o.fGroup,o.mGroup,o.paired,o.apart,o.clutches,o.cond,laidStr(o)]
+        .concat(FIND.map(function(f){ return cnt[f.k]||''; }))
+        .concat([(o.found||[]).map(function(f){ return f.t+' '+(f.s||'?')+(f.w?' '+f.w+'g':'')+(f.m?' '+f.m:''); }).join('; '), o.notes]);
+    });
+  } else if(type==='reading'){
+    head=['Date','Room','Time','Temp °C','Humidity %','By'];
+    body=rows.map(function(o){ return [o.date,'INFR#'+o.room,o.slot,o.temp,o.hum,o.emp]; });
+  } else if(type==='roomday'){
+    head=['Date','Room','By','HVAC ON','HVAC set °C','HVAC set %','HVAC problems','HPS ON periods','HPS h','HPS working','MH ON periods','MH h','MH broken','Lights ON periods','Lights h','Aisles L/M/R','Fans','Exhaust','Notes'];
+    body=rows.map(function(o){
+      var hv=o.hvac||[];
+      return [o.date,'INFR#'+o.room,o.emp,
+        hv.filter(function(u){return u.pw==='on';}).length+'/3', hv.map(function(u){return u.t||'—';}).join(' / '), hv.map(function(u){return u.h||'—';}).join(' / '),
+        hv.map(function(u,i){ return u.st==='problem'?'#'+(i+1)+(u.n?' '+u.n:''):''; }).filter(String).join('; '),
+        schedStr(o.hps), fmtH(schedHrs(o.hps)), 40-((o.hps&&o.hps.broken)||[]).length,
+        schedStr(o.mh), fmtH(schedHrs(o.mh)), ((o.mh&&o.mh.cages)||[]).reduce(function(a,c){ return a+num(c&&c[1]); },0),
+        schedStr(o.lights), fmtH(schedHrs(o.lights)),
+        ['L','M','R'].map(function(k){ return (o.aisles&&o.aisles[k])||'—'; }).join(' / '),
+        (o.fans||[]).map(function(f,i){ return '#'+(i+1)+' '+(f.pw||'—')+(f.on?' '+f.on+'–'+(f.off||''):''); }).join('; '),
+        (o.exhaust&&o.exhaust.pw||'—')+(o.exhaust&&o.exhaust.on?' '+o.exhaust.on+'–'+(o.exhaust.off||''):''),
+        [o.notes,o.lightNotes].filter(Boolean).join(' | ')];
+    });
+  } else {
+    head=['Date','Room','Change'];
+    rows.forEach(function(o){ (o.changes||[]).forEach(function(c){ body.push([o.date,'INFR#'+o.room,c]); }); });
+  }
+  return {head:head, body:body};
+}
+function renderHistory(){
+  var t=histTable();
+  document.getElementById('history-body').innerHTML = t.body.length
+    ? '<table class="t"><thead><tr>'+t.head.map(function(x){ return '<th>'+esc(x)+'</th>'; }).join('')+'</tr></thead><tbody>'+
+      t.body.map(function(r){ return '<tr>'+r.map(function(x){ return '<td>'+esc(x==null?'':x)+'</td>'; }).join('')+'</tr>'; }).join('')+'</tbody></table>'
+    : '<div class="empty">Nothing for these filters. This device keeps the last 21 days — use "Load from Sheet" for older dates. · ဒေတာ မရှိပါ</div>';
+}
+function loadHistoryRange(){
+  if(!SHEET_URL){ showSetupWarn(); return; }
+  var from=document.getElementById('h-from').value, to=document.getElementById('h-to').value;
+  if(!from||!to){ showToast('Pick From and To dates · ရက်စွဲ ရွေးပါ','err'); return; }
+  showToast('Loading… · ဆွဲယူနေ');
+  api({action:'list',from:from,to:to}).then(function(res){ HIST_EXTRA=res; renderHistory(); showToast('✅ Loaded · ပြီးပါပြီ','ok'); })
+    .catch(function(e){ showToast('⚠️ '+e.message,'err'); });
+}
+function exportCSV(){
+  var t=histTable(); if(!t.body.length){ showToast('Nothing to export','err'); return; }
+  var csv=[t.head].concat(t.body).map(function(r){ return r.map(function(v){ return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download='INFR_'+document.getElementById('h-type').value+'_'+todayStr()+'.csv'; a.click();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+function tick(){
+  var d=new Date();
+  document.getElementById('clock').textContent=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})+' '+nowHM();
+}
+document.addEventListener('DOMContentLoaded', function(){
+  loadLocal();
+  try{ document.getElementById('emp').value=localStorage.getItem('srr_infr_emp')||''; curRoom=+(localStorage.getItem('srr_infr_room')||1)||1; }catch(e){}
+  curDate=todayStr(); document.getElementById('date').value=curDate;
+  document.getElementById('h-to').value=curDate; document.getElementById('h-from').value=addDays(curDate,-6);
+  document.getElementById('st-to').value=curDate; document.getElementById('st-from').value=addDays(curDate,-6);
+  renderRooms(); document.getElementById('topbar-card').style.display='none'; renderGroups(); tick(); setInterval(tick, 30000);
+  if(!SHEET_URL){ showSetupWarn(); pillState(); }
+  else { pull(); setInterval(function(){ pull(); pushPending(); }, 20000); }
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden && SHEET_URL){ pull(); pushPending(); } });
+  window.addEventListener('online', function(){ if(SHEET_URL){ pull(); pushPending(); } });
+  // keep the hourly banner / missed slots current
+  setInterval(function(){ if(curTab==='room' && !document.querySelector('#page-room input:focus, #page-room textarea:focus')) renderRoom(); }, 120000);
+  window.addEventListener('beforeunload', function(e){ if(rdDirty || editingDirty){ e.preventDefault(); e.returnValue=''; } });
+});
+</script>
+</body>
+</html>
